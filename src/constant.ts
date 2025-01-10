@@ -1,7 +1,7 @@
 export const FULLNODE_URL = "https://fullnode.devnet.sui.io";
 
 export const CLIENT_ID =
-  "573120070871-0k7ga6ns79ie0jpg1ei6ip5vje2ostt6.apps.googleusercontent.com";
+  "135850664250-v6sbai8e86ocvki9vkfh3bjkek4fh9d6.apps.googleusercontent.com";
 
 export const REDIRECT_URI = "https://sui-zklogin.vercel.app/";
 
