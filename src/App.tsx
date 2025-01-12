@@ -1,21 +1,9 @@
-import { LoadingButton } from "@mui/lab";
 import {
-  Alert,
-  Box,
   Button,
-  ButtonGroup,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  Stack,
-  Typography,
-  Paper,
-  CircularProgress,
-  Link,
-  IconButton,
-  Skeleton,
 } from "@mui/material";
 import { fromB64 } from "@mysten/bcs";
 import { useSuiClientQuery } from "@mysten/dapp-kit";
@@ -37,8 +25,8 @@ import { BigNumber } from "bignumber.js";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { enqueueSnackbar } from "notistack";
 import queryString from "query-string";
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
 import GoogleLogo from "./assets/google.svg";
@@ -79,7 +67,6 @@ const WALLET_ADDRESS_STORAGE_KEY = 'zklogin_wallet_address';
 const ZK_PROOF_STORAGE_KEY = 'zklogin_zk_proof';
 const FAUCET_STATUS_STORAGE_KEY = 'zklogin_faucet_requested';
 
-const SNACKBAR_DURATION = 4000;
 
 interface SnackbarState {
   visible: boolean;
@@ -100,7 +87,7 @@ const generateDeterministicSalt = (email: string): string => {
   return Math.abs(hash).toString();
 };
 
-const StatsTab = () => (
+const StatsTab = ({ currentEpoch }: { currentEpoch: string }) => (
   <div className="space-y-4">
     {/* Network Stats Card */}
     <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-6 border border-white/5">
@@ -117,16 +104,16 @@ const StatsTab = () => (
           <span className="text-xs text-green-400">+0.00%</span>
         </div>
 
-        {/* Total Transactions */}
+        {/* Current Epoch */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
               <BiNetworkChart className="w-4 h-4 text-purple-400" />
             </div>
-            <span className="text-sm text-white/60">Transactions</span>
+            <span className="text-sm text-white/60">Current Epoch</span>
           </div>
-          <p className="text-2xl font-bold text-white">0</p>
-          <span className="text-xs text-green-400">+0 this month</span>
+          <p className="text-2xl font-bold text-white">{currentEpoch || '...'}</p>
+          <span className="text-xs text-white/60">Network Height</span>
         </div>
       </div>
     </div>
@@ -244,7 +231,7 @@ const ActivityTab = () => (
 );
 
 function App() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [currentEpoch, setCurrentEpoch] = useState("");
   const [nonce, setNonce] = useState("");
@@ -261,12 +248,12 @@ function App() {
   const [maxEpoch, setMaxEpoch] = useState(0);
   const [randomness, setRandomness] = useState("");
   const [activeStep, setActiveStep] = useState(0);
-  const [fetchingZKProof, setFetchingZKProof] = useState(false);
+  const [, setFetchingZKProof] = useState(false);
   const [executingTxn, setExecutingTxn] = useState(false);
-  const [executeDigest, setExecuteDigest] = useState("");
-  const [lang, setLang] = useState<"zh" | "en">("en");
+  const [, setExecuteDigest] = useState("");
+  const [lang] = useState<"zh" | "en">("en");
   const [hasFaucetRequested, setHasFaucetRequested] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [, setIsInitializing] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -382,7 +369,7 @@ function App() {
         console.error('Initialization error:', error);
         enqueueSnackbar('Failed to initialize wallet. Please try again.', { 
           variant: 'error',
-          action: (key) => (
+          action: () => (
             <Button color="inherit" size="small" onClick={() => window.location.reload()}>
               Retry
             </Button>
@@ -431,35 +418,35 @@ function App() {
     }
   }, [ephemeralKeyPair, maxEpoch, randomness, nonce]);
 
-  const nextButtonDisabled = useMemo(() => {
-    switch (activeStep) {
-      case 0:
-        return !ephemeralKeyPair;
-      case 1:
-        return !currentEpoch || !randomness;
-      case 2:
-        return !jwtString;
-      case 3:
-        return !userSalt;
-      case 4:
-        return !zkLoginUserAddress;
-      case 5:
-        return !zkProof;
-      case 6:
-        return true;
-      default:
-        return true;
-    }
-  }, [
-    currentEpoch,
-    randomness,
-    activeStep,
-    jwtString,
-    ephemeralKeyPair,
-    zkLoginUserAddress,
-    zkProof,
-    userSalt,
-  ]);
+  // const nextButtonDisabled = useMemo(() => {
+  //   switch (activeStep) {
+  //     case 0:
+  //       return !ephemeralKeyPair;
+  //     case 1:
+  //       return !currentEpoch || !randomness;
+  //     case 2:
+  //       return !jwtString;
+  //     case 3:
+  //       return !userSalt;
+  //     case 4:
+  //       return !zkLoginUserAddress;
+  //     case 5:
+  //       return !zkProof;
+  //     case 6:
+  //       return true;
+  //     default:
+  //       return true;
+  //   }
+  // }, [
+  //   currentEpoch,
+  //   randomness,
+  //   activeStep,
+  //   jwtString,
+  //   ephemeralKeyPair,
+  //   zkLoginUserAddress,
+  //   zkProof,
+  //   userSalt,
+  // ]);
 
   // query zkLogin address balance
   const { data: addressBalance } = useSuiClientQuery(
@@ -524,31 +511,31 @@ function App() {
 
   const [requestingFaucet, setRequestingFaucet] = useState(false);
 
-  const requestFaucet = async () => {
-    if (!zkLoginUserAddress || hasFaucetRequested) {
-      return;
-    }
-    try {
-      setRequestingFaucet(true);
-      await axios.post(SUI_DEVNET_FAUCET, {
-        FixedAmountRequest: {
-          recipient: zkLoginUserAddress,
-        },
-      });
-      setHasFaucetRequested(true);
-      enqueueSnackbar("Successfully received test tokens!", {
-        variant: "success",
-      });
-    } catch (error) {
-      console.error(error);
-      const err = error as { response?: { data?: { message?: string } } };
-      enqueueSnackbar(String(err?.response?.data?.message || error), {
-        variant: "error",
-      });
-    } finally {
-      setRequestingFaucet(false);
-    }
-  };
+  // const requestFaucet = async () => {
+  //   if (!zkLoginUserAddress || hasFaucetRequested) {
+  //     return;
+  //   }
+  //   try {
+  //     setRequestingFaucet(true);
+  //     await axios.post(SUI_DEVNET_FAUCET, {
+  //       FixedAmountRequest: {
+  //         recipient: zkLoginUserAddress,
+  //       },
+  //     });
+  //     setHasFaucetRequested(true);
+  //     enqueueSnackbar("Successfully received test tokens!", {
+  //       variant: "success",
+  //     });
+  //   } catch (error) {
+  //     console.error(error);
+  //     const err = error as { response?: { data?: { message?: string } } };
+  //     enqueueSnackbar(String(err?.response?.data?.message || error), {
+  //       variant: "error",
+  //     });
+  //   } finally {
+  //     setRequestingFaucet(false);
+  //   }
+  // };
 
   // Auto generate user salt and address when JWT is available
   useEffect(() => {
@@ -780,20 +767,20 @@ function App() {
     );
   };
 
-  // Create a ComingSoon component
-  const ComingSoonTab = ({ title }: { title: string }) => (
-    <div className="flex-1 flex flex-col items-center justify-center p-4">
-      <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-8 shadow-xl text-center max-w-md w-full">
-        <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
-          <FaCoins className="w-8 h-8 text-blue-400" />
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-        <p className="text-white/60">
-          This feature is coming soon. Stay tuned for updates!
-        </p>
-      </div>
-    </div>
-  );
+  // // Create a ComingSoon component
+  // const ComingSoonTab = ({ title }: { title: string }) => (
+  //   <div className="flex-1 flex flex-col items-center justify-center p-4">
+  //     <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-8 shadow-xl text-center max-w-md w-full">
+  //       <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
+  //         <FaCoins className="w-8 h-8 text-blue-400" />
+  //       </div>
+  //       <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+  //       <p className="text-white/60">
+  //         This feature is coming soon. Stay tuned for updates!
+  //       </p>
+  //     </div>
+  //   </div>
+  // );
 
   const handleOpenReceiveModal = () => {
     setOpenReceiveModal(true);
@@ -810,23 +797,6 @@ function App() {
       setCopied(true);
     }
   };
-
-  const showSnackbar = useCallback((message: string, options?: { description?: string; type?: 'success' | 'error' | 'info' | 'warning' }) => {
-    if (snackbarTimeoutRef.current) {
-      clearTimeout(snackbarTimeoutRef.current);
-    }
-    
-    setSnackbar({
-      visible: true,
-      message,
-      description: options?.description,
-      type: options?.type || 'info'
-    });
-
-    snackbarTimeoutRef.current = setTimeout(() => {
-      setSnackbar(prev => ({ ...prev, visible: false }));
-    }, SNACKBAR_DURATION);
-  }, []);
 
   if (!zkLoginUserAddress) {
     return (
@@ -1080,7 +1050,7 @@ function App() {
 
             {/* Section Content */}
             <div className="">
-              {activeSection === 'stats' && <StatsTab />}
+              {activeSection === 'stats' && <StatsTab currentEpoch={currentEpoch} />}
               {activeSection === 'community' && <CommunityTab />}
               {activeSection === 'activity' && <ActivityTab />}
             </div>
