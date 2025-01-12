@@ -231,6 +231,17 @@ const ActivityTab = () => (
   </div>
 );
 
+// Add this interface for the API response
+interface BlockberryResponse {
+  data: {
+    content: Array<{
+      price: number;
+      priceChange24h: number;
+      // Add other fields as needed
+    }>;
+  };
+}
+
 function App() {
   const { i18n } = useTranslation();
   const [showResetDialog, setShowResetDialog] = useState(false);
@@ -266,6 +277,8 @@ function App() {
     type: 'info'
   });
   const snackbarTimeoutRef = useRef<NodeJS.Timeout>();
+  const [suiPrice, setSuiPrice] = useState<number>(0);
+  const [priceChange24h, setPriceChange24h] = useState<number>(0);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -799,6 +812,42 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const fetchSuiPrice = async () => {
+      const options = {
+        method: 'GET',
+        url: 'https://api.blockberry.one/sui/v1/coins',
+        params: {
+          page: '0',
+          size: '20',
+          orderBy: 'DESC',
+          sortBy: 'AGE',
+          withImage: 'TRUE'
+        },
+        headers: {
+          accept: '*/*',
+          'x-api-key': 'V4O9xRP59Iv1Shv6SXI3lD55HHYdHN'
+        }
+      };
+
+      try {
+        const response = await axios.request<BlockberryResponse>(options);
+        const suiData = response.data.data.content[0]; // Assuming SUI is the first coin
+        
+        setSuiPrice(suiData.price);
+        setPriceChange24h(suiData.priceChange24h);
+      } catch (error) {
+        console.error('Error fetching SUI price:', error);
+        enqueueSnackbar('Failed to fetch SUI price', { variant: 'error' });
+      }
+    };
+
+    fetchSuiPrice();
+    // Fetch price every 60 seconds
+    const interval = setInterval(fetchSuiPrice, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   if (!zkLoginUserAddress) {
     return (
       <div className="flex flex-col min-h-screen bg-[#0A0A0F] text-white antialiased">
@@ -870,7 +919,7 @@ function App() {
     <div className="flex flex-col min-h-screen bg-[#0A0A0F] text-white antialiased">
       {/* Header */}
       <div className="px-4 py-4 flex justify-between items-center sticky top-0 bg-[#0A0A0F]/90 backdrop-blur-xl z-50 border-b border-white/5">
-        {/* User Info and Actions */}
+        {/* Left side: User Info and Actions */}
         <div className="flex items-center gap-3">
           {/* User Avatar and Address */}
           <div className="relative group">
@@ -889,12 +938,28 @@ function App() {
             )}
           </div>
         </div>
-        {/* Reset and Logout Buttons */}
+
+        {/* Center: SUI Price */}
+        <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2">
+          <FaCoins className="w-4 h-4 text-blue-400" />
+          <div className="flex flex-col items-start">
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-medium text-white">${suiPrice.toFixed(2)}</span>
+              <span className={`text-xs ${priceChange24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {priceChange24h >= 0 ? '↑' : '↓'}{Math.abs(priceChange24h).toFixed(2)}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side: Reset and Logout */}
         <div className="flex items-center gap-3">
-          {/* <button onClick={() => setShowResetDialog(true)} className="bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 rounded-full p-2 transition-all duration-200" title="Reset Wallet">
-          </button> */}
-          <button onClick={() => { resetLocalState(); enqueueSnackbar('Successfully logged out', { variant: 'success' }); }} className="bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-full p-2 transition-all duration-200" title="Logout">
-            <FiLogOut size={20} /> {/* Logout Icon */}
+          <button 
+            onClick={() => { resetLocalState(); enqueueSnackbar('Successfully logged out', { variant: 'success' }); }} 
+            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-full p-2 transition-all duration-200" 
+            title="Logout"
+          >
+            <FiLogOut size={20} />
           </button>
         </div>
       </div>
@@ -914,11 +979,23 @@ function App() {
                   </div>
                   <div>
                     <span className="text-sm font-medium text-white/60">Total Balance</span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-white">
-                        {addressBalance ? BigNumber(addressBalance?.totalBalance).div(MIST_PER_SUI.toString()).toFixed(4) : '0.0000'}
-                      </span>
-                      <span className="text-sm font-medium text-white/60">SUI</span>
+                    <div className="flex flex-col">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-white">
+                          {addressBalance ? BigNumber(addressBalance?.totalBalance).div(MIST_PER_SUI.toString()).toFixed(4) : '0.0000'}
+                        </span>
+                        <span className="text-sm font-medium text-white/60">SUI</span>
+                      </div>
+                      {suiPrice > 0 && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-white/60">
+                            ${(suiPrice * (addressBalance ? BigNumber(addressBalance?.totalBalance).div(MIST_PER_SUI.toString()).toNumber() : 0)).toFixed(2)}
+                          </span>
+                          <span className={`text-xs ${priceChange24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {priceChange24h >= 0 ? '↑' : '↓'} {Math.abs(priceChange24h).toFixed(2)}%
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
