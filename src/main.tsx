@@ -13,6 +13,9 @@ import { StyledSnackbarProvider } from "./components/StyledSnackbarProvider.tsx"
 import "./index.css";
 import ThemeConfig from "./theme/index.ts";
 import { resources } from "./lang/resources.ts";
+import '@telegram-apps/telegram-ui/dist/styles.css';
+import { AppRoot } from '@telegram-apps/telegram-ui';
+
 
 const { networkConfig } = createNetworkConfig({
   devnet: { url: getFullnodeUrl("devnet") },
@@ -36,6 +39,7 @@ i18n
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
+  <AppRoot>
     <ThemeProvider theme={createTheme(ThemeConfig)}>
       <QueryClientProvider client={queryClient}>
         <SuiClientProvider networks={networkConfig} network="devnet">
@@ -47,5 +51,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </SuiClientProvider>
       </QueryClientProvider>
     </ThemeProvider>
+    </AppRoot>
   </BrowserRouter>
 );
