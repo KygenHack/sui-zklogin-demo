@@ -3,7 +3,7 @@ export const FULLNODE_URL = "https://fullnode.devnet.sui.io";
 export const CLIENT_ID =
  "135850664250-li2pat4pjcf4btua3dqhetm96ina4kei.apps.googleusercontent.com";
 
-export const REDIRECT_URI = "http://localhost:5173";
+export const REDIRECT_URI = "https://sui-stake-zklogin.vercel.app";
 
 export const SUI_DEVNET_FAUCET = 'https://faucet.devnet.sui.io/gas'
 

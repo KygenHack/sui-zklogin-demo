@@ -825,7 +825,7 @@ function App() {
           <div className="max-w-md w-full space-y-8 text-center">
             <div className="space-y-3">
               <h1 className="text-3xl font-bold tracking-tight text-white">
-                Welcome to SUI Wallet
+                Welcome to SUI Stake Wallet
               </h1>
               <p className="text-white/60">
                 Connect with Google to access your wallet and start transacting on the SUI network.
