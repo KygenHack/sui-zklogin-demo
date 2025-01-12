@@ -816,7 +816,7 @@ function App() {
     const fetchSuiPrice = async () => {
       const options = {
         method: 'GET',
-        url: 'https://api.blockberry.one/sui/v1/coins',
+        url: 'https://cors.blockberry.one/sui/v1/coins', // Using CORS-enabled endpoint
         params: {
           page: '0',
           size: '20',
@@ -827,25 +827,67 @@ function App() {
         headers: {
           accept: '*/*',
           'x-api-key': 'V4O9xRP59Iv1Shv6SXI3lD55HHYdHN'
-        }
+        },
+        // Add timeout and retry configuration
+        timeout: 5000,
+        retries: 3
       };
 
       try {
         const response = await axios.request<BlockberryResponse>(options);
-        const suiData = response.data.data.content[0]; // Assuming SUI is the first coin
         
-        setSuiPrice(suiData.price);
-        setPriceChange24h(suiData.priceChange24h);
+        if (response.data && response.data.data && response.data.data.content && response.data.data.content.length > 0) {
+          const suiData = response.data.data.content[0];
+          setSuiPrice(suiData.price);
+          setPriceChange24h(suiData.priceChange24h);
+        } else {
+          // Fallback to a different API if Blockberry fails
+          const fallbackResponse = await axios.get(
+            'https://api.coingecko.com/api/v3/simple/price?ids=sui&vs_currencies=usd&include_24hr_change=true'
+          );
+          setSuiPrice(fallbackResponse.data.sui.usd);
+          setPriceChange24h(fallbackResponse.data.sui.usd_24h_change);
+        }
       } catch (error) {
         console.error('Error fetching SUI price:', error);
-        enqueueSnackbar('Failed to fetch SUI price', { variant: 'error' });
+        
+        // Attempt fallback to CoinGecko if Blockberry fails
+        try {
+          const fallbackResponse = await axios.get(
+            'https://api.coingecko.com/api/v3/simple/price?ids=sui&vs_currencies=usd&include_24hr_change=true'
+          );
+          setSuiPrice(fallbackResponse.data.sui.usd);
+          setPriceChange24h(fallbackResponse.data.sui.usd_24h_change);
+        } catch (fallbackError) {
+          console.error('Fallback API also failed:', fallbackError);
+          enqueueSnackbar('Unable to fetch price data', { 
+            variant: 'error',
+            action: () => (
+              <Button color="inherit" size="small" onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            )
+          });
+        }
       }
     };
 
     fetchSuiPrice();
-    // Fetch price every 60 seconds
-    const interval = setInterval(fetchSuiPrice, 60000);
-    return () => clearInterval(interval);
+    
+    // Add error handling for the interval
+    let intervalId: NodeJS.Timeout;
+    try {
+      intervalId = setInterval(fetchSuiPrice, 60000);
+    } catch (error) {
+      console.error('Error setting up price refresh interval:', error);
+    }
+
+    // Cleanup
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, []);
 
   if (!zkLoginUserAddress) {
@@ -944,10 +986,18 @@ function App() {
           <FaCoins className="w-4 h-4 text-blue-400" />
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-1">
-              <span className="text-sm font-medium text-white">${suiPrice.toFixed(2)}</span>
-              <span className={`text-xs ${priceChange24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {priceChange24h >= 0 ? '↑' : '↓'}{Math.abs(priceChange24h).toFixed(2)}%
-              </span>
+              {suiPrice ? (
+                <>
+                  <span className="text-sm font-medium text-white">${suiPrice.toFixed(2)}</span>
+                  {typeof priceChange24h === 'number' && (
+                    <span className={`text-xs ${priceChange24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {priceChange24h >= 0 ? '↑' : '↓'}{Math.abs(priceChange24h).toFixed(2)}%
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-sm text-white/60">Loading...</span>
+              )}
             </div>
           </div>
         </div>
