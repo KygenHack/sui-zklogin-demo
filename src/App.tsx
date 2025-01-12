@@ -50,6 +50,7 @@ import {
 } from "./constant";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { suistakeLogo } from "./images";
 
 interface ExtendedJwtPayload extends JwtPayload {
   email?: string;
@@ -824,8 +825,9 @@ function App() {
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="max-w-md w-full space-y-8 text-center">
             <div className="space-y-3">
+              <img src={suistakeLogo} alt="SUI Stake Logo" className="w-25 h-25 mx-auto mb-4" />
               <h1 className="text-3xl font-bold tracking-tight text-white">
-                Welcome to SUI Stake Wallet
+                Welcome to SUI Stake
               </h1>
               <p className="text-white/60">
                 Connect with Google to access your wallet and start transacting on the SUI network.
