@@ -1,3 +1,4 @@
+import React, { StrictMode } from 'react';
 import { ThemeProvider } from "@emotion/react";
 import { createTheme } from "@mui/material";
 import { SuiClientProvider, createNetworkConfig } from "@mysten/dapp-kit";
@@ -15,7 +16,11 @@ import ThemeConfig from "./theme/index.ts";
 import { resources } from "./lang/resources.ts";
 import '@telegram-apps/telegram-ui/dist/styles.css';
 import { AppRoot } from '@telegram-apps/telegram-ui';
-
+import { retrieveLaunchParams, backButton } from '@telegram-apps/sdk-react';
+import { init } from './init.ts';
+import './mockEnv.ts';
+import { EnvUnsupported } from './components/EnvUnsupported.tsx';
+import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 
 const { networkConfig } = createNetworkConfig({
   devnet: { url: getFullnodeUrl("devnet") },
@@ -24,33 +29,53 @@ const { networkConfig } = createNetworkConfig({
 const queryClient = new QueryClient();
 
 i18n
-  .use(initReactI18next) // passes i18n down to react-i18next
+  .use(initReactI18next)
   .init({
-    // the translations
-    // (tip move them in a JSON file and import them,
-    // or even better, manage them via a UI: https://react.i18next.com/guides/multiple-translation-files#manage-your-translations-with-a-management-gui)
     resources: resources,
-    lng: "en", // if you're using a language detector, do not define the lng option
+    lng: "en",
     fallbackLng: "en",
     interpolation: {
-      escapeValue: false, // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
+      escapeValue: false,
     },
   });
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+
+const Root = () => (
   <BrowserRouter>
-  <AppRoot>
-    <ThemeProvider theme={createTheme(ThemeConfig)}>
-      <QueryClientProvider client={queryClient}>
-        <SuiClientProvider networks={networkConfig} network="devnet">
-          <StyledSnackbarProvider maxSnack={4} autoHideDuration={3000} />
-          <Routes>
-            <Route path="/" element={<App />}></Route>
-          </Routes>
-          <Analytics />
-        </SuiClientProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <AppRoot>
+      <ErrorBoundary>
+        <ThemeProvider theme={createTheme(ThemeConfig)}>
+          <QueryClientProvider client={queryClient}>
+            <SuiClientProvider networks={networkConfig} network="devnet">
+              <StyledSnackbarProvider maxSnack={4} autoHideDuration={3000} />
+              <Routes>
+                <Route path="/" element={<App />}></Route>
+              </Routes>
+              <Analytics />
+            </SuiClientProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
     </AppRoot>
   </BrowserRouter>
 );
+
+try {
+  // Configure all application dependencies
+  init(retrieveLaunchParams().startParam === 'debug' || import.meta.env.DEV);
+  
+  // Setup back button handler
+  backButton.onClick(() => {
+    window.history.back();
+  });
+
+  root.render(
+    <React.StrictMode>
+      <Root />
+    </React.StrictMode>
+  );
+} catch (e) {
+  console.error('Failed to initialize Telegram environment:', e);
+  root.render(<EnvUnsupported />);
+}

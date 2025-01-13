@@ -36,6 +36,7 @@ import { BiNetworkChart } from 'react-icons/bi';
 import { RiMessage3Line } from 'react-icons/ri';
 import { QRCodeSVG } from 'qrcode.react';
 import { FiLogOut } from 'react-icons/fi';
+import { initData, useSignal } from '@telegram-apps/sdk-react';
 
 import {
   CLIENT_ID,
@@ -171,9 +172,34 @@ const CommunityTab = () => (
           <p className="text-sm text-white/80">Welcome to the SUI community! Stay tuned for updates.</p>
         </div>
 
-        {/* Empty State */}
-        <div className="text-center py-6">
-          <p className="text-sm text-white/40">No more updates to show</p>
+        {/* Airdrop Tasks */}
+        <div className="bg-white/5 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <img src="https://xelene.me/telegram.gif" alt="" className="w-8 h-8 rounded-full" />
+            <div>
+              <p className="text-sm font-medium text-white">Daily Task</p>
+              <p className="text-xs text-white/60">Reward: 0.1 SUI</p>
+            </div>
+          </div>
+          <p className="text-sm text-white/80 mb-3">Follow @SuiStake on Twitter and retweet our latest post.</p>
+          <button className="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg px-4 py-2 text-sm font-medium transition-colors">
+            Complete Task
+          </button>
+        </div>
+
+        {/* More Tasks */}
+        <div className="bg-white/5 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <img src="https://xelene.me/telegram.gif" alt="" className="w-8 h-8 rounded-full" />
+            <div>
+              <p className="text-sm font-medium text-white">Weekly Challenge</p>
+              <p className="text-xs text-white/60">Reward: 1 SUI</p>
+            </div>
+          </div>
+          <p className="text-sm text-white/80 mb-3">Stake at least 10 SUI for 7 days.</p>
+          <button className="w-full bg-gray-500/10 hover:bg-gray-500/20 text-gray-400 rounded-lg px-4 py-2 text-sm font-medium transition-colors" disabled>
+            Coming Soon
+          </button>
         </div>
       </div>
     </div>
@@ -279,6 +305,8 @@ function App() {
   const snackbarTimeoutRef = useRef<NodeJS.Timeout>();
   const [suiPrice, setSuiPrice] = useState<number>(0);
   const [priceChange24h, setPriceChange24h] = useState<number>(0);
+  const initDataState = useSignal(initData.state);
+  const user = initDataState?.user;
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -893,23 +921,49 @@ function App() {
   if (!zkLoginUserAddress) {
     return (
       <div className="flex flex-col min-h-screen bg-[#0A0A0F] text-white antialiased">
-        {/* Header */}
-        <div className="px-4 py-4 flex justify-between items-center sticky top-0 bg-[#0A0A0F]/90 backdrop-blur-xl z-50 border-b border-white/5">
+        {/* Header - Enhanced user profile section */}
+        <div className="px-4 sm:px-6 py-4 flex justify-between items-center sticky top-0 bg-black/80 backdrop-blur-lg z-50 border-b border-white/5">
           <div className="flex items-center gap-3">
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0066FF] via-purple-600 to-pink-500 rounded-full opacity-75 group-hover:opacity-100 blur transition duration-1000 group-hover:duration-200 animate-gradient"></div>
               <div className="relative">
                 <img 
-                  src={"https://xelene.me/telegram.gif"} 
+                  src={user?.photoUrl || "https://xelene.me/telegram.gif"} 
                   alt="" 
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-black/50"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-black"
                 />
+                {user?.isPremium && (
+                  <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full ring-2 ring-black">
+                    <span className="text-xs">⭐️</span>
+                  </div>
+                )}
               </div>
             </div>
-            <span className="text-[15px] font-semibold text-white/50 leading-tight">
-              Anonymous
-            </span>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-white">
+                  @{user?.username || 'Anonymous'}
+                </span>
+                {user?.isPremium && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 text-yellow-500 rounded-full ring-1 ring-yellow-500/20">
+                    Premium
+                  </span>
+                )}
+              </div>
+              <span className="text-sm text-gray-400">
+                {user?.firstName || 'Anonymous'} {user?.lastName || ''}
+              </span>
+            </div>
           </div>
+          
+          {/* Add this button */}
+           <Button 
+            className="relative overflow-hidden bg-gradient-to-r from-[#0066FF] to-blue-700 hover:from-[#0052cc] hover:to-blue-800 text-white rounded-[20px] px-8 py-5 font-medium transition-all duration-300 flex items-center gap-2 shadow-lg shadow-blue-500/20 border border-white/10 hover:scale-105"
+          >
+            <div className="absolute inset-0 bg-grid-white/10 bg-[size:6px_6px] motion-safe:animate-grid-white"></div>
+            <span className="relative z-10 text-sm font-semibold text-white">Invite friends</span>
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10"></span>
+          </Button>
         </div>
 
         {/* Auth Content */}
@@ -963,23 +1017,46 @@ function App() {
       <div className="px-4 py-4 flex justify-between items-center sticky top-0 bg-[#0A0A0F]/90 backdrop-blur-xl z-50 border-b border-white/5">
         {/* Left side: User Info and Actions */}
         <div className="flex items-center gap-3">
-          {/* User Avatar and Address */}
-          <div className="relative group">
-            <img src={"https://xelene.me/telegram.gif"} alt="" className="w-10 h-10 rounded-full object-cover ring-2 ring-black/50" />
-          </div>
-          <div className="flex flex-col">
-            {zkLoginUserAddress && (
-              <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 hover:bg-white/10 transition-colors group">
-                <span className="text-xs font-medium text-white/60">
-                  {zkLoginUserAddress.slice(0, 6)}...{zkLoginUserAddress.slice(-4)}
-                </span>
-                <button onClick={handleCopyAddress} className="text-blue-300 hover:text-blue-300 transition-colors ml-1" title="Copy address">
-                  {copied ? <CheckCircleIcon /> : <ContentCopyIcon />}
-                </button>
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0066FF] via-purple-600 to-pink-500 rounded-full opacity-75 group-hover:opacity-100 blur transition duration-1000 group-hover:duration-200 animate-gradient"></div>
+              <div className="relative">
+                <img 
+                  src={user?.photoUrl || "https://xelene.me/telegram.gif"} 
+                  alt="" 
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-black"
+                />
+                {user?.isPremium && (
+                  <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full ring-2 ring-black">
+                    <span className="text-xs">⭐️</span>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+            <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-1">
+                  <div className="h-4 w-[1px] bg-white/10"></div>
+                  <span className="text-xs font-medium text-white/60">
+                    @{user?.username || 'anon'}
+                  </span>
+                  {user?.isPremium && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 text-yellow-500 rounded-full ring-1 ring-yellow-500/20">
+                      Premium
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 hover:bg-white/10 transition-colors group border border-white/5">
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span className="text-xs font-medium text-white/60">
+                      {zkLoginUserAddress.slice(0, 6)}...{zkLoginUserAddress.slice(-4)}
+                    </span>
+                  </div>
+                  <button onClick={handleCopyAddress} className="text-blue-300 hover:text-blue-300 transition-colors ml-1" title="Copy address">
+                    {copied ? <CheckCircleIcon /> : <ContentCopyIcon />}
+                  </button>
+                </div>
+            </div>
           </div>
-        </div>
 
         {/* Center: SUI Price */}
         <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2">
