@@ -119,7 +119,7 @@ const StatsTab = ({
               </div>
               <span className="text-sm text-white/60">Total Value</span>
             </div>
-            <p className="text-2xl font-bold text-white">≈ {(balanceInSui * suiPrice).toFixed(2)}</p>
+            <p className="text-2xl font-bold text-white">${(balanceInSui * suiPrice).toFixed(2)}</p>
             <span className="text-xs text-white/60">≈ {formattedBalance} SUI</span>
           </div>
 
