@@ -1116,7 +1116,7 @@ function App() {
                     <FaCoins className="w-5 h-5 text-blue-400" />
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-white/60">Total Balance</span>
+                    <span className="text-sm font-medium text-white/60">Wallet Balance</span>
                     <div className="flex flex-col">
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold text-white">
