@@ -951,7 +951,9 @@ function App() {
                 )}
               </div>
               <span className="text-sm text-gray-400">
-                {user?.firstName || 'Anonymous'} {user?.lastName || ''}
+                <span className="text-sm font-medium text-white/80 truncate max-w-[120px]" title={`${user?.firstName || 'Anonymous'} ${user?.lastName || ''}`}>
+                  {user?.firstName || 'Anonymous'} {user?.lastName || ''}
+                </span>
               </span>
             </div>
           </div>
