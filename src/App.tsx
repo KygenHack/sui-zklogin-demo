@@ -189,9 +189,9 @@ const CommunityTab = () => (
               <p className="text-xs text-white/60">Reward: 1.0 points</p>
             </div>
           </div>
-          <p className="text-sm text-white/80 mb-3">Follow @SuiStake on X and retweet our pinned post</p>
+          <p className="text-sm text-white/80 mb-3">Follow @SuiStakeit on X and retweet our pinned post</p>
           <a 
-            href="https://x.com/SuiStake" 
+            href="https://x.com/SuiStakeit" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2"
@@ -248,6 +248,7 @@ const CommunityTab = () => (
             href="https://t.me/suistakeit" 
             target="_blank" 
             rel="noopener noreferrer" 
+            
             className="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
             Complete Task
@@ -778,6 +779,33 @@ function App() {
 
     return () => clearInterval(interval);
   }, [jwtString]);
+
+  // Add this near your other useEffect hooks
+  useEffect(() => {
+    // Function to refresh the session
+    const refreshSession = async () => {
+      try {
+        if (!jwtString || !maxEpoch) return;
+        
+        // Get current epoch
+        const { epoch } = await suiClient.getLatestSuiSystemState();
+        const currentEpoch = Number(epoch);
+        
+        // If we're approaching max epoch (e.g., within 5 epochs), refresh
+        if (maxEpoch - currentEpoch <= 5) {
+          // Re-fetch JWT token
+          const loginUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&response_type=id_token&redirect_uri=${REDIRECT_URI}&scope=openid%20email&nonce=${nonce}`;
+          window.location.href = loginUrl;
+        }
+      } catch (error) {
+        console.error('Failed to refresh session:', error);
+      }
+    };
+
+    // Check every 5 minutes
+    const interval = setInterval(refreshSession, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [jwtString, maxEpoch, nonce]);
 
   const handleTransaction = async () => {
     try {
