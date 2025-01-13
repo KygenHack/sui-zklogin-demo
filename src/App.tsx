@@ -203,7 +203,7 @@ const CommunityTab = () => (
           </a>
         </div>
 
-        {/* Facebook Task */}
+        Facebook Task
         <div className="bg-white/5 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 rounded-full bg-[#1877F2] flex items-center justify-center">
@@ -245,7 +245,7 @@ const CommunityTab = () => (
           </div>
           <p className="text-sm text-white/80 mb-3">Join our Telegram group and stay active</p>
           <a 
-            href="https://t.me/SuiStake" 
+            href="https://t.me/suistakeit" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2"
