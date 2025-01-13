@@ -195,7 +195,7 @@ const CommunityTab = () => (
             </div>
             <div>
               <p className="text-sm font-medium text-white">Follow on Facebook</p>
-              <p className="text-xs text-white/60">Reward: 0.75 Points</p>
+              <p className="text-xs text-white/60">Reward: 0.75 points</p>
             </div>
           </div>
           <p className="text-sm text-white/80 mb-3">Like our Facebook page and share our latest post</p>
@@ -222,7 +222,7 @@ const CommunityTab = () => (
             </div>
             <div>
               <p className="text-sm font-medium text-white">Join Telegram Community</p>
-              <p className="text-xs text-white/60">Reward: 0.75 SUI</p>
+              <p className="text-xs text-white/60">Reward: 0.75 points</p>
             </div>
           </div>
           <p className="text-sm text-white/80 mb-3">Join our Telegram group and stay active</p>
