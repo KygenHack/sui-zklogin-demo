@@ -256,7 +256,7 @@ const ActivityTab = () => (
         </div>
         <Button
           size="small"
-          className="bg-white/5 hover:bg-white/10 text-white/60 rounded-full px-4 py-1 text-xs"
+          className="bg-white/5 hover:bg-white/10 text-white rounded-full px-4 py-1 text-xs"
         >
           Filter
         </Button>
