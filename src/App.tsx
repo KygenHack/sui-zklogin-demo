@@ -961,7 +961,7 @@ function App() {
             className="relative overflow-hidden bg-gradient-to-r from-[#0066FF] to-blue-700 hover:from-[#0052cc] hover:to-blue-800 text-white rounded-[20px] px-8 py-5 font-medium transition-all duration-300 flex items-center gap-2 shadow-lg shadow-blue-500/20 border border-white/10 hover:scale-105"
           >
             <div className="absolute inset-0 bg-grid-white/10 bg-[size:6px_6px] motion-safe:animate-grid-white"></div>
-            <span className="relative z-10 text-sm font-semibold text-white">Invite friends</span>
+            <span className="relative z-10 text-sm font-semibold text-white">Invite</span>
             <span className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10"></span>
           </Button>
         </div>
@@ -1020,11 +1020,22 @@ function App() {
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0066FF] via-purple-600 to-pink-500 rounded-full opacity-75 group-hover:opacity-100 blur transition duration-1000 group-hover:duration-200 animate-gradient"></div>
               <div className="relative">
-                <img 
-                  src={user?.photoUrl || "https://xelene.me/telegram.gif"} 
-                  alt="" 
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-black"
-                />
+                {user?.photoUrl ? (
+                  <img 
+                    src={user.photoUrl}
+                    alt={user.firstName || 'User'} 
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-black"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://xelene.me/telegram.gif";
+                    }}
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center ring-2 ring-black">
+                    <span className="text-white text-sm font-medium">
+                      {(user?.firstName?.[0] || 'A').toUpperCase()}
+                    </span>
+                  </div>
+                )}
                 {user?.isPremium && (
                   <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full ring-2 ring-black">
                     <span className="text-xs">⭐️</span>
