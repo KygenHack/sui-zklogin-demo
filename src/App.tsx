@@ -152,7 +152,7 @@ const CommunityTab = () => (
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-white/60">Total Reward:</span>
-          <span className="text-xs font-medium text-green-400">2.5 SUI</span>
+          <span className="text-xs font-medium text-green-400">2.5 points</span>
         </div>
       </div>
       
@@ -168,7 +168,7 @@ const CommunityTab = () => (
             </div>
             <div>
               <p className="text-sm font-medium text-white">Follow on X</p>
-              <p className="text-xs text-white/60">Reward: 1.0 SUI</p>
+              <p className="text-xs text-white/60">Reward: 1.0 points</p>
             </div>
           </div>
           <p className="text-sm text-white/80 mb-3">Follow @SuiStake on X and retweet our pinned post</p>
@@ -195,7 +195,7 @@ const CommunityTab = () => (
             </div>
             <div>
               <p className="text-sm font-medium text-white">Follow on Facebook</p>
-              <p className="text-xs text-white/60">Reward: 0.75 SUI</p>
+              <p className="text-xs text-white/60">Reward: 0.75 Points</p>
             </div>
           </div>
           <p className="text-sm text-white/80 mb-3">Like our Facebook page and share our latest post</p>
@@ -221,7 +221,7 @@ const CommunityTab = () => (
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Join Telegram</p>
+              <p className="text-sm font-medium text-white">Join Telegram Community</p>
               <p className="text-xs text-white/60">Reward: 0.75 SUI</p>
             </div>
           </div>
@@ -959,7 +959,6 @@ function App() {
     return (
       <div className="flex flex-col min-h-screen bg-[#0A0A0F] text-white antialiased">
         {/* Header - Enhanced user profile section */}
-        {/* Header - Enhanced user profile section */}
         <div className="px-4 sm:px-6 py-4 flex justify-between items-center sticky top-0 bg-black/80 backdrop-blur-lg z-50 border-b border-white/5">
           <div className="flex items-center gap-3">
             <div className="relative group">
@@ -989,7 +988,7 @@ function App() {
                 )}
               </div>
               <span className="text-sm text-gray-400">
-                {user?.firstName || 'Anonymous'} {user?.lastName || ''}
+                {user?.firstName || 'Anonymous'}
               </span>
             </div>
           </div>
