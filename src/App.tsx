@@ -89,55 +89,73 @@ const generateDeterministicSalt = (email: string): string => {
   return Math.abs(hash).toString();
 };
 
-const StatsTab = ({ currentEpoch }: { currentEpoch: string }) => (
-  <div className="space-y-4">
-    {/* Network Stats Card */}
-    <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-6 border border-white/5">
-      <div className="grid grid-cols-2 gap-6">
-        {/* Total Value */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
-              <FaCoins className="w-4 h-4 text-blue-400" />
-            </div>
-            <span className="text-sm text-white/60">Total Value</span>
-          </div>
-          <p className="text-2xl font-bold text-white">$0.00</p>
-          <span className="text-xs text-green-400">+0.00%</span>
-        </div>
+const StatsTab = ({ 
+  currentEpoch, 
+  addressBalance, 
+  suiPrice 
+}: { 
+  currentEpoch: string, 
+  addressBalance?: { totalBalance: string },
+  suiPrice: number 
+}) => {
+  // Calculate balance in SUI
+  const balanceInSui = addressBalance 
+    ? Number(addressBalance.totalBalance) / Number(MIST_PER_SUI)
+    : 0;
 
-        {/* Current Epoch */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
-              <BiNetworkChart className="w-4 h-4 text-purple-400" />
+  // Format balance with 4 decimal places
+  const formattedBalance = balanceInSui.toFixed(4);
+
+  return (
+    <div className="space-y-4">
+      {/* Network Stats Card */}
+      <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-6 border border-white/5">
+        <div className="grid grid-cols-2 gap-6">
+          {/* Total Value */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <FaCoins className="w-4 h-4 text-blue-400" />
+              </div>
+              <span className="text-sm text-white/60">Total Value</span>
             </div>
-            <span className="text-sm text-white/60">Current Epoch</span>
+            <p className="text-2xl font-bold text-white">{formattedBalance} SUI</p>
+            <span className="text-xs text-white/60">≈ ${(balanceInSui * suiPrice).toFixed(2)}</span>
           </div>
-          <p className="text-2xl font-bold text-white">{currentEpoch || '...'}</p>
-          <span className="text-xs text-white/60">Network Height</span>
+
+          {/* Current Epoch */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
+                <BiNetworkChart className="w-4 h-4 text-purple-400" />
+              </div>
+              <span className="text-sm text-white/60">Current Epoch</span>
+            </div>
+            <p className="text-2xl font-bold text-white">{currentEpoch || '...'}</p>
+            <span className="text-xs text-white/60">Network Height</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Gas Usage Card */}
+      <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-6 border border-white/5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
+              <FaCoins className="w-4 h-4 text-orange-400" />
+            </div>
+            <span className="text-sm text-white/60">Gas Usage</span>
+          </div>
+          <span className="text-xs text-white/40">Last 30 days</span>
+        </div>
+        <p className="text-2xl font-bold text-white mb-2">0 SUI</p>
+        <div className="w-full h-2 bg-white/5 rounded-full">
+          <div className="w-0 h-full bg-orange-500 rounded-full"></div>
         </div>
       </div>
     </div>
-
-    {/* Gas Usage Card */}
-    <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-6 border border-white/5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
-            <FaCoins className="w-4 h-4 text-orange-400" />
-          </div>
-          <span className="text-sm text-white/60">Gas Usage</span>
-        </div>
-        <span className="text-xs text-white/40">Last 30 days</span>
-      </div>
-      <p className="text-2xl font-bold text-white mb-2">0 SUI</p>
-      <div className="w-full h-2 bg-white/5 rounded-full">
-        <div className="w-0 h-full bg-orange-500 rounded-full"></div>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 const CommunityTab = () => (
   <div className="space-y-4">
@@ -256,7 +274,7 @@ const ActivityTab = () => (
         </div>
         <Button
           size="small"
-          className="bg-white/5 hover:bg-white/10 text-white rounded-full px-4 py-1 text-xs"
+          className="bg-white/5 hover:bg-white/10 text-white rounded-full px-4 py-1 text-xs text-white"
         >
           Filter
         </Button>
@@ -1271,7 +1289,7 @@ function App() {
 
             {/* Section Content */}
             <div className="">
-              {activeSection === 'stats' && <StatsTab currentEpoch={currentEpoch} />}
+              {activeSection === 'stats' && <StatsTab currentEpoch={currentEpoch} addressBalance={addressBalance} suiPrice={suiPrice} />}
               {activeSection === 'community' && <CommunityTab />}
               {activeSection === 'activity' && <ActivityTab />}
             </div>
