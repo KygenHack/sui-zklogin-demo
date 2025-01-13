@@ -1015,61 +1015,27 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0A0A0F] text-white antialiased">
-      {/* Header */}
-      <div className="px-4 py-4 flex justify-between items-center sticky top-0 bg-[#0A0A0F]/90 backdrop-blur-xl z-50 border-b border-white/5">
+        {/* Header */}
+        <div className="px-4 py-4 flex justify-between items-center sticky top-0 bg-[#0A0A0F]/90 backdrop-blur-xl z-50 border-b border-white/5">
         {/* Left side: User Info and Actions */}
         <div className="flex items-center gap-3">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0066FF] via-purple-600 to-pink-500 rounded-full opacity-75 group-hover:opacity-100 blur transition duration-1000 group-hover:duration-200 animate-gradient"></div>
-              <div className="relative">
-                {user?.photoUrl ? (
-                  <img 
-                    src={user.photoUrl}
-                    alt={user.firstName || 'User'} 
-                    className="w-10 h-10 rounded-full object-cover ring-2 ring-black"
-                    onError={(e) => {
-                      e.currentTarget.src = "https://xelene.me/telegram.gif";
-                    }}
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center ring-2 ring-black">
-                    <span className="text-white text-sm font-medium">
-                      {(user?.firstName?.[0] || 'A').toUpperCase()}
-                    </span>
-                  </div>
-                )}
-                {user?.isPremium && (
-                  <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full ring-2 ring-black">
-                    <span className="text-xs">⭐️</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="flex flex-col">
-            <div className="flex items-center gap-2 mb-1">
-                  <div className="h-4 w-[1px] bg-white/10"></div>
-                  <span className="text-xs font-medium text-white/60">
-                    @{user?.username || 'anon'}
-                  </span>
-                  {user?.isPremium && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 text-yellow-500 rounded-full ring-1 ring-yellow-500/20">
-                      Premium
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 hover:bg-white/10 transition-colors group border border-white/5">
-                  <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                    <span className="text-xs font-medium text-white/60">
-                      {zkLoginUserAddress.slice(0, 6)}...{zkLoginUserAddress.slice(-4)}
-                    </span>
-                  </div>
-                  <button onClick={handleCopyAddress} className="text-blue-300 hover:text-blue-300 transition-colors ml-1" title="Copy address">
-                    {copied ? <CheckCircleIcon /> : <ContentCopyIcon />}
-                  </button>
-                </div>
-            </div>
+          {/* User Avatar and Address */}
+          <div className="relative group">
+            <img src={"https://xelene.me/telegram.gif"} alt="" className="w-10 h-10 rounded-full object-cover ring-2 ring-black/50" />
           </div>
+          <div className="flex flex-col">
+            {zkLoginUserAddress && (
+              <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 hover:bg-white/10 transition-colors group">
+                <span className="text-xs font-medium text-white/60">
+                  {zkLoginUserAddress.slice(0, 6)}...{zkLoginUserAddress.slice(-4)}
+                </span>
+                <button onClick={handleCopyAddress} className="text-blue-300 hover:text-blue-300 transition-colors ml-1" title="Copy address">
+                  {copied ? <CheckCircleIcon /> : <ContentCopyIcon />}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Center: SUI Price */}
         <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2">
