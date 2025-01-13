@@ -1,4 +1,4 @@
-import React, { StrictMode } from 'react';
+import React from 'react';
 import { ThemeProvider } from "@emotion/react";
 import { createTheme } from "@mui/material";
 import { SuiClientProvider, createNetworkConfig } from "@mysten/dapp-kit";
