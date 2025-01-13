@@ -922,6 +922,7 @@ function App() {
     return (
       <div className="flex flex-col min-h-screen bg-[#0A0A0F] text-white antialiased">
         {/* Header - Enhanced user profile section */}
+        {/* Header - Enhanced user profile section */}
         <div className="px-4 sm:px-6 py-4 flex justify-between items-center sticky top-0 bg-black/80 backdrop-blur-lg z-50 border-b border-white/5">
           <div className="flex items-center gap-3">
             <div className="relative group">
@@ -951,9 +952,7 @@ function App() {
                 )}
               </div>
               <span className="text-sm text-gray-400">
-                <span className="text-sm font-medium text-white/80 truncate max-w-[120px]" title={`${user?.firstName || 'Anonymous'} ${user?.lastName || ''}`}>
-                  {user?.firstName || 'Anonymous'} {user?.lastName || ''}
-                </span>
+                {user?.firstName || 'Anonymous'} {user?.lastName || ''}
               </span>
             </div>
           </div>
