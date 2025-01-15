@@ -16,3 +16,11 @@
 .safe-area-pb {
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+.custom-w-16 {
+  width: 15rem;
+}
+
+.custom-h-16 {
+  height: 13rem;
+}

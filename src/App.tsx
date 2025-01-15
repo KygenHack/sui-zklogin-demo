@@ -51,7 +51,7 @@ import {
 } from "./constant";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { suistakeLogo } from "./images";
+import { sui, suistakeLogo } from "./images";
 
 interface ExtendedJwtPayload extends JwtPayload {
   email?: string;
@@ -68,6 +68,9 @@ const JWT_TOKEN_STORAGE_KEY = 'zklogin_jwt_token';
 const WALLET_ADDRESS_STORAGE_KEY = 'zklogin_wallet_address';
 const ZK_PROOF_STORAGE_KEY = 'zklogin_zk_proof';
 const FAUCET_STATUS_STORAGE_KEY = 'zklogin_faucet_requested';
+const PERSISTENT_JWT_KEY = 'zklogin_persistent_jwt';
+const PERSISTENT_SALT_KEY = 'zklogin_persistent_salt';
+const PERSISTENT_ADDRESS_KEY = 'zklogin_persistent_address';
 
 
 interface SnackbarState {
@@ -115,7 +118,11 @@ const StatsTab = ({
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <FaCoins className="w-4 h-4 text-blue-400" />
+                <img 
+                  src={sui} 
+                  alt="SUI" 
+                  className="w-8 h-8" 
+                />
               </div>
               <span className="text-sm text-white/60">Total Value</span>
             </div>
@@ -273,12 +280,6 @@ const ActivityTab = () => (
           </div>
           <span className="text-sm font-medium text-white">Transaction History</span>
         </div>
-        <Button
-          size="small"
-          className="bg-white/5 hover:bg-white/10 text-white rounded-full px-4 py-1 text-xs text-white"
-        >
-          Filter
-        </Button>
       </div>
       
       {/* Empty State */}
@@ -1001,6 +1002,35 @@ function App() {
     };
   }, []);
 
+  // Add these storage keys if not already defined
+  const PERSISTENT_JWT_KEY = 'zklogin_persistent_jwt';
+  const PERSISTENT_SALT_KEY = 'zklogin_persistent_salt';
+  const PERSISTENT_ADDRESS_KEY = 'zklogin_persistent_address';
+
+  // In your App component, add persistence logic
+  useEffect(() => {
+    // Save to persistent storage whenever these values change
+    if (jwtString && userSalt && zkLoginUserAddress) {
+      localStorage.setItem(PERSISTENT_JWT_KEY, jwtString);
+      localStorage.setItem(PERSISTENT_SALT_KEY, userSalt);
+      localStorage.setItem(PERSISTENT_ADDRESS_KEY, zkLoginUserAddress);
+    }
+  }, [jwtString, userSalt, zkLoginUserAddress]);
+
+  // Add this to your initialization logic
+  useEffect(() => {
+    // Try to restore session from persistent storage
+    const savedJwt = localStorage.getItem(PERSISTENT_JWT_KEY);
+    const savedSalt = localStorage.getItem(PERSISTENT_SALT_KEY);
+    const savedAddress = localStorage.getItem(PERSISTENT_ADDRESS_KEY);
+
+    if (savedJwt && savedSalt && savedAddress) {
+      setJwtString(savedJwt);
+      setUserSalt(savedSalt);
+      setZkLoginUserAddress(savedAddress);
+    }
+  }, []);
+
   if (!zkLoginUserAddress) {
     return (
       <div className="flex flex-col min-h-screen bg-[#0A0A0F] text-white antialiased">
@@ -1053,7 +1083,11 @@ function App() {
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="max-w-md w-full space-y-8 text-center">
             <div className="space-y-3">
-              <img src={suistakeLogo} alt="SUI Stake Logo" className="w-25 h-25 mx-auto mb-4" />
+              <img 
+                src={suistakeLogo} 
+                alt="SUI Stake Logo" 
+                className="custom-w-16 custom-h-16 mx-auto mb-4"
+              />
               <h1 className="text-3xl font-bold tracking-tight text-white">
                 Welcome to SUI Stake
               </h1>
@@ -1120,7 +1154,11 @@ function App() {
 
         {/* Center: SUI Price */}
         <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2">
-          <FaCoins className="w-4 h-4 text-blue-400" />
+          <img 
+            src={sui} 
+            alt="SUI" 
+            className="w-8 h-8" 
+          />
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-1">
               {suiPrice ? (
@@ -1163,7 +1201,11 @@ function App() {
                 {/* Balance Info */}
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <FaCoins className="w-5 h-5 text-blue-400" />
+                    <img 
+                      src={sui} 
+                      alt="SUI" 
+                      className="w-8 h-8" 
+                    />
                   </div>
                   <div>
                     <span className="text-sm font-medium text-white/60">Wallet Balance</span>
@@ -1298,7 +1340,11 @@ function App() {
                     onClick={() => setActiveSection('activity')}
                   >
                     <div className="flex items-center justify-center gap-2">
-                      <FaCoins className={`w-4 h-4 ${activeSection === 'activity' ? 'text-white' : 'text-gray-400'}`} />
+                      <img 
+                        src={sui}
+                        alt="SUI" 
+                        className="w-8 h-8" 
+                      />
                       <span className="font-medium text-white">Activity</span>
                     </div>
                   </Button>
