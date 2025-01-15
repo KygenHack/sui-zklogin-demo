@@ -51,7 +51,7 @@ import {
 } from "./constant";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { suistakeLogo } from "./images";
+import { sui, suistakeLogo } from "./images";
 
 interface ExtendedJwtPayload extends JwtPayload {
   email?: string;
@@ -115,8 +115,12 @@ const StatsTab = ({
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <FaCoins className="w-4 h-4 text-blue-400" />
-              </div>
+              <img 
+            src={sui} 
+            alt="SUI" 
+            className="w-8 h-8" 
+          />              
+          </div>
               <span className="text-sm text-white/60">Total Value</span>
             </div>
             <p className="text-2xl font-bold text-white">${(balanceInSui * suiPrice).toFixed(2)}</p>
@@ -142,7 +146,11 @@ const StatsTab = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
-              <FaCoins className="w-4 h-4 text-orange-400" />
+            <img 
+            src={sui} 
+            alt="SUI" 
+            className="w-8 h-8" 
+          />
             </div>
             <span className="text-sm text-white/60">Gas Usage</span>
           </div>
@@ -296,7 +304,11 @@ const ActivityTab = () => (
         <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-              <FaCoins className="w-5 h-5 text-green-400" />
+            <img 
+            src={sui} 
+            alt="SUI" 
+            className="w-8 h-8" 
+          />
             </div>
             <div>
               <p className="text-sm font-medium text-white">Sent SUI</p>
@@ -1120,7 +1132,11 @@ function App() {
 
         {/* Center: SUI Price */}
         <div className="flex items-center gap-2 bg-white/5 rounded-full px-4 py-2">
-          <FaCoins className="w-4 h-4 text-blue-400" />
+        <img 
+            src={sui} 
+            alt="SUI" 
+            className="w-8 h-8" 
+          />
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-1">
               {suiPrice ? (
@@ -1163,7 +1179,11 @@ function App() {
                 {/* Balance Info */}
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <FaCoins className="w-5 h-5 text-blue-400" />
+                  <img 
+            src={sui} 
+            alt="SUI" 
+            className="w-8 h-8" 
+          />
                   </div>
                   <div>
                     <span className="text-sm font-medium text-white/60">Wallet Balance</span>
