@@ -68,10 +68,6 @@ const JWT_TOKEN_STORAGE_KEY = 'zklogin_jwt_token';
 const WALLET_ADDRESS_STORAGE_KEY = 'zklogin_wallet_address';
 const ZK_PROOF_STORAGE_KEY = 'zklogin_zk_proof';
 const FAUCET_STATUS_STORAGE_KEY = 'zklogin_faucet_requested';
-const PERSISTENT_JWT_KEY = 'zklogin_persistent_jwt';
-const PERSISTENT_SALT_KEY = 'zklogin_persistent_salt';
-const PERSISTENT_ADDRESS_KEY = 'zklogin_persistent_address';
-
 
 interface SnackbarState {
   visible: boolean;
@@ -485,15 +481,15 @@ function App() {
   // Add effects to persist data when it changes
   useEffect(() => {
     if (jwtString) {
-      window.localStorage.setItem(JWT_TOKEN_STORAGE_KEY, jwtString);
+      localStorage.setItem(JWT_TOKEN_STORAGE_KEY, jwtString);
     }
-  }, [jwtString]);
-
-  useEffect(() => {
+    if (userSalt) {
+      localStorage.setItem(USER_SALT_LOCAL_STORAGE_KEY, userSalt);
+    }
     if (zkLoginUserAddress) {
-      window.localStorage.setItem(WALLET_ADDRESS_STORAGE_KEY, zkLoginUserAddress);
+      localStorage.setItem(WALLET_ADDRESS_STORAGE_KEY, zkLoginUserAddress);
     }
-  }, [zkLoginUserAddress]);
+  }, [jwtString, userSalt, zkLoginUserAddress]);
 
   useEffect(() => {
     if (zkProof) {
