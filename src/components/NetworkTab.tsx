@@ -18,7 +18,7 @@ const MOCK_USER = {
 };
 
 const getRankTier = (rank: number) => {
-  const tiers = ['Unranked', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
+  const tiers = ['Starter', 'Visionary', 'Pioneer', 'Accumulator', 'Elite', 'Legendary', 'Supreme'];
   return tiers[rank] || 'Unranked';
 };
 
@@ -39,7 +39,7 @@ export const NetworkTab = () => {
   const user = MOCK_USER; // Using mock data
 
   return (
-    <div className="flex-1 p-4 sm:p-6 space-y-6">
+    <div className="flex-1 sm:p-6 space-y-6">
       {/* Network Overview Card */}
       <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -252,4 +252,6 @@ export const NetworkTab = () => {
       </div>
     </div>
   );
-}; 
+};
+
+export default NetworkTab; 
