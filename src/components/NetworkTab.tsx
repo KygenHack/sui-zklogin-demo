@@ -42,25 +42,6 @@ export const NetworkTab = () => {
         </div>
       </div>
 
-      {/* Rank Progress */}
-      <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-lg font-semibold text-gray-200">Rank Progress</span>
-          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-500/20 text-blue-400 rounded-full">
-            Current
-          </span>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-blue-500 rounded-full" 
-              style={{ width: '30%' }}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Referral Levels */}
       <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
         <div className="flex items-center justify-between mb-6">

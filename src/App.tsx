@@ -1264,7 +1264,7 @@ function App() {
               </div>
             </div>
 
-             {/* Earnings Card */}
+             {/* Earnings Card
              <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/5">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-gray-200">Earnings Available</span>
@@ -1288,7 +1288,7 @@ function App() {
                   <div className="w-1/3 h-full bg-blue-500 rounded-full" />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Stats Navigation with Active Indicator */}
             <div className="mb-6">
