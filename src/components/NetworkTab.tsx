@@ -14,35 +14,6 @@ export const NetworkTab = () => {
     <div className="flex-1 sm:p-6 space-y-6">
       {/* Referral Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bonus Stats */}
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
-          <div className="grid grid-cols-2 gap-4">
-            {/* Total Paid Out */}
-            <div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                  <FaCoins className="text-green-500 text-xl" />
-                </div>
-                <span className="text-gray-400">Total paid out</span>
-              </div>
-              <span className="text-2xl font-bold text-white tabular-nums">$0</span>
-              <span className="text-sm text-gray-400 block mt-1">0 SUI</span>
-            </div>
-
-            {/* Expected Rank Bonus */}
-            <div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                  <FaCoins className="text-yellow-500 text-xl" />
-                </div>
-                <span className="text-gray-400">Expected bonus</span>
-              </div>
-              <span className="text-2xl font-bold text-white tabular-nums">$0</span>
-              <span className="text-sm text-gray-400 block mt-1">0 SUI</span>
-            </div>
-          </div>
-        </div>
-
         {/* Referral Link */}
         <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
           <div className="flex items-center justify-between mb-4">
