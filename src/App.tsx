@@ -30,7 +30,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
 import GoogleLogo from "./assets/google.svg";
 import { FaCoins } from 'react-icons/fa';
-import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai';
+import { AiOutlineHome } from 'react-icons/ai';
 import { BiNetworkChart } from 'react-icons/bi';
 import { RiMessage3Line } from 'react-icons/ri';
 import { QRCodeSVG } from 'qrcode.react';
