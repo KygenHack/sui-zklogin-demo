@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Button } from '@mui/material';
 import { FaCoins, FaExternalLinkAlt } from 'react-icons/fa';
 
-const getRankTier = (rank: number) => {
-  const tiers = ['Starter', 'Visionary', 'Pioneer', 'Accumulator', 'Elite', 'Legendary', 'Supreme'];
-  return tiers[rank] || 'Unranked';
-};
+// const getRankTier = (rank: number) => {
+//   const tiers = ['Starter', 'Visionary', 'Pioneer', 'Accumulator', 'Elite', 'Legendary', 'Supreme'];
+//   return tiers[rank] || 'Unranked';
+// };
 
 export const NetworkTab = () => {
   const [selectedLevel, setSelectedLevel] = useState(1);
