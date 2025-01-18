@@ -21,9 +21,31 @@ import { init } from './init.ts';
 import './mockEnv.ts';
 import { EnvUnsupported } from './components/EnvUnsupported.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
+import {
+  DEVNET_COUNTER_PACKAGE_ID,
+  TESTNET_COUNTER_PACKAGE_ID,
+  MAINNET_COUNTER_PACKAGE_ID,
+} from "./constant.ts";
 
 const { networkConfig } = createNetworkConfig({
-  devnet: { url: getFullnodeUrl("devnet") },
+  devnet: {
+    url: getFullnodeUrl("devnet"),
+    variables: {
+      counterPackageId: DEVNET_COUNTER_PACKAGE_ID,
+    }
+  },
+  testnet: {
+    url: getFullnodeUrl("testnet"),
+    variables: {
+      counterPackageId: TESTNET_COUNTER_PACKAGE_ID,
+    }
+  },
+  mainnet: {
+    url: getFullnodeUrl("mainnet"),
+    variables: {
+      counterPackageId: MAINNET_COUNTER_PACKAGE_ID,
+    }
+  }
 });
 
 const queryClient = new QueryClient();
@@ -47,7 +69,7 @@ const Root = () => (
       <ErrorBoundary>
         <ThemeProvider theme={createTheme(ThemeConfig)}>
           <QueryClientProvider client={queryClient}>
-            <SuiClientProvider networks={networkConfig} network="devnet">
+            <SuiClientProvider networks={networkConfig} defaultNetwork="devnet">
               <StyledSnackbarProvider maxSnack={4} autoHideDuration={3000} />
               <Routes>
                 <Route path="/" element={<App />}></Route>

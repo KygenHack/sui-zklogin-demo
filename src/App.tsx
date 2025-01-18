@@ -10,7 +10,7 @@ import { useSuiClientQuery } from "@mysten/dapp-kit";
 import { SuiClient } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { MIST_PER_SUI } from "@mysten/sui.js/utils";
+import { isValidSuiObjectId, MIST_PER_SUI } from "@mysten/sui.js/utils";
 import {
   genAddressSeed,
   generateNonce,
@@ -47,11 +47,15 @@ import {
   SUI_DEVNET_FAUCET,
   SUI_PROVER_DEV_ENDPOINT,
   USER_SALT_LOCAL_STORAGE_KEY,
+  COUNTER_ID_STORAGE_KEY,
 } from "./constant";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { sui, suistakeLogo } from "./images";
 import { NetworkTab } from './components/NetworkTab';
+import { CreateCounter } from "./components/CreateCounter";
+import { Counter } from "./components/Counter";
+import { useNetworkVariable } from "./networkConfig";
 
 interface ExtendedJwtPayload extends JwtPayload {
   email?: string;
@@ -68,7 +72,6 @@ const JWT_TOKEN_STORAGE_KEY = 'zklogin_jwt_token';
 const WALLET_ADDRESS_STORAGE_KEY = 'zklogin_wallet_address';
 const ZK_PROOF_STORAGE_KEY = 'zklogin_zk_proof';
 const FAUCET_STATUS_STORAGE_KEY = 'zklogin_faucet_requested';
-
 
 interface SnackbarState {
   visible: boolean;
@@ -355,6 +358,13 @@ function App() {
   const initDataState = useSignal(initData.state);
   const user = initDataState?.user;
 
+
+    const [counterId, setCounter] = useState(() => {
+      const hash = window.location.hash.slice(1);
+      return isValidSuiObjectId(hash) ? hash : null;
+    });
+
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -507,36 +517,6 @@ function App() {
     }
   }, [ephemeralKeyPair, maxEpoch, randomness, nonce]);
 
-  // const nextButtonDisabled = useMemo(() => {
-  //   switch (activeStep) {
-  //     case 0:
-  //       return !ephemeralKeyPair;
-  //     case 1:
-  //       return !currentEpoch || !randomness;
-  //     case 2:
-  //       return !jwtString;
-  //     case 3:
-  //       return !userSalt;
-  //     case 4:
-  //       return !zkLoginUserAddress;
-  //     case 5:
-  //       return !zkProof;
-  //     case 6:
-  //       return true;
-  //     default:
-  //       return true;
-  //   }
-  // }, [
-  //   currentEpoch,
-  //   randomness,
-  //   activeStep,
-  //   jwtString,
-  //   ephemeralKeyPair,
-  //   zkLoginUserAddress,
-  //   zkProof,
-  //   userSalt,
-  // ]);
-
   // query zkLogin address balance
   const { data: addressBalance } = useSuiClientQuery(
     "getBalance",
@@ -545,7 +525,7 @@ function App() {
     },
     {
       enabled: Boolean(zkLoginUserAddress),
-      refetchInterval: 1500,
+      refetchInterval: 1500
     }
   );
 
@@ -559,6 +539,8 @@ function App() {
     window.localStorage.removeItem(USER_SALT_LOCAL_STORAGE_KEY);
     window.sessionStorage.removeItem(KEY_PAIR_SESSION_STORAGE_KEY);
     window.sessionStorage.removeItem(RANDOMNESS_SESSION_STORAGE_KEY);
+    window.localStorage.removeItem(COUNTER_ID_STORAGE_KEY);
+    setCounter(null);
 
     // Reset all state
     setCurrentEpoch("");
@@ -599,32 +581,6 @@ function App() {
   };
 
   const [requestingFaucet, setRequestingFaucet] = useState(false);
-
-  // const requestFaucet = async () => {
-  //   if (!zkLoginUserAddress || hasFaucetRequested) {
-  //     return;
-  //   }
-  //   try {
-  //     setRequestingFaucet(true);
-  //     await axios.post(SUI_DEVNET_FAUCET, {
-  //       FixedAmountRequest: {
-  //         recipient: zkLoginUserAddress,
-  //       },
-  //     });
-  //     setHasFaucetRequested(true);
-  //     enqueueSnackbar("Successfully received test tokens!", {
-  //       variant: "success",
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //     const err = error as { response?: { data?: { message?: string } } };
-  //     enqueueSnackbar(String(err?.response?.data?.message || error), {
-  //       variant: "error",
-  //     });
-  //   } finally {
-  //     setRequestingFaucet(false);
-  //   }
-  // };
 
   // Auto generate user salt and address when JWT is available
   useEffect(() => {
@@ -797,77 +753,6 @@ function App() {
     const interval = setInterval(refreshSession, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [jwtString, maxEpoch, nonce]);
-
-  // const handleTransaction = async () => {
-  //   try {
-  //     if (!ephemeralKeyPair || !zkProof || !decodedJwt || !userSalt) {
-  //       enqueueSnackbar('Missing required wallet data', { variant: 'error' });
-  //       return;
-  //     }
-
-  //     setExecutingTxn(true);
-  //     const txb = new TransactionBlock();
-
-  //     // Create a test transaction (sending 1 SUI)
-  //     const [coin] = txb.splitCoins(txb.gas, [1000000000]); // 1 SUI = 1000000000 MIST
-  //     txb.transferObjects(
-  //       [coin],
-  //       "0xfa0f8542f256e669694624aa3ee7bfbde5af54641646a3a05924cf9e329a8a36" // Example recipient
-  //     );
-  //     txb.setSender(zkLoginUserAddress);
-
-  //     // Sign the transaction with ephemeral key pair
-  //     const { bytes, signature: userSignature } = await txb.sign({
-  //       client: suiClient,
-  //       signer: ephemeralKeyPair,
-  //     });
-
-  //     if (!decodedJwt.sub || !decodedJwt.aud) {
-  //       throw new Error('Invalid JWT data');
-  //     }
-
-  //     // Generate address seed
-  //     const addressSeed = genAddressSeed(
-  //       BigInt(userSalt),
-  //       'sub',
-  //       decodedJwt.sub,
-  //       decodedJwt.aud as string
-  //     ).toString();
-
-  //     console.log('Address Seed:', addressSeed);
-  //     console.log('ZK Proof:', zkProof);
-
-  //     // Create zkLogin signature
-  //     const zkLoginSignature: SerializedSignature = getZkLoginSignature({
-  //       inputs: {
-  //         ...zkProof,
-  //         addressSeed,
-  //       },
-  //       maxEpoch,
-  //       userSignature,
-  //     });
-
-  //     console.log('ZK Login Signature:', zkLoginSignature);
-
-  //     // Execute the transaction
-  //     const executeRes = await suiClient.executeTransactionBlock({
-  //       transactionBlock: bytes,
-  //       signature: zkLoginSignature,
-  //     });
-
-  //     enqueueSnackbar('Transaction successful!', { variant: 'success' });
-  //     setExecuteDigest(executeRes.digest);
-
-  //   } catch (error) {
-  //     console.error('Transaction error:', error);
-  //     enqueueSnackbar(
-  //       error instanceof Error ? error.message : 'Transaction failed', 
-  //       { variant: 'error' }
-  //     );
-  //   } finally {
-  //     setExecutingTxn(false);
-  //   }
-  // };
 
   // Add email verification to Google sign-in
   const handleGoogleSignIn = () => {
@@ -1049,6 +934,215 @@ function App() {
       setExecutingTxn(false);
     }
   };
+
+  // Add these near the top with other state declarations
+  const [selectedNetwork, setSelectedNetwork] = useState(() => {
+    const saved = localStorage.getItem('selected_network');
+    return saved || 'devnet';
+  });
+
+  // Add this effect to handle network changes
+  useEffect(() => {
+    localStorage.setItem('selected_network', selectedNetwork);
+    // Here you would typically reinitialize your SUI client with the new network
+    // and handle any necessary state resets
+  }, [selectedNetwork]);
+
+  // Add these state declarations at the top of the App component
+  const [showWizard, setShowWizard] = useState(() => {
+    // Check if user has completed the wizard before
+    const hasCompletedWizard = localStorage.getItem('has_completed_wizard');
+    return !hasCompletedWizard;
+  });
+  const [wizardStep, setWizardStep] = useState(0);
+
+  // Add this function to handle wizard completion
+  const handleWizardComplete = () => {
+    localStorage.setItem('has_completed_wizard', 'true');
+    setShowWizard(false);
+    // Show success message
+    enqueueSnackbar('Welcome to SUI Stake! 🎉\nYou\'re now ready to explore the world of Web3', { 
+      variant: 'success'
+    });
+  };
+
+  // Add this array of wizard steps
+  const wizardSteps = [
+    {
+      title: "Welcome to Web3",
+      description: "Learn the basics of blockchain and start your Web3 journey with SUI",
+      image: "path/to/welcome-image.svg", // Add appropriate image paths
+      content: (
+        <div className="space-y-4">
+          <div className="flex justify-center">
+            <img src={suistakeLogo} alt="SUI" className="w-32 h-32 animate-float" />
+          </div>
+          <h3 className="text-xl font-bold text-white">Your Gateway to Web3</h3>
+          <p className="text-white/60">
+            SUI Stake makes it easy to enter the world of Web3. Learn about blockchain, 
+            create your wallet, and start your journey in just a few minutes.
+          </p>
+        </div>
+      )
+    },
+    {
+      title: "Understanding Web3 Wallets",
+      description: "Learn how Web3 wallets work and why they're important",
+      image: "path/to/wallet-image.svg",
+      content: (
+        <div className="space-y-4">
+          <div className="flex justify-center">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+              <svg className="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+          </div>
+          <h3 className="text-xl font-bold text-white">Your Digital Wallet</h3>
+          <p className="text-white/60">
+            A Web3 wallet is your identity in the blockchain world. It lets you:
+          </p>
+          <ul className="text-white/60 space-y-2">
+            <li className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">✓</span>
+              Store and manage your digital assets
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">✓</span>
+              Make secure transactions
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">✓</span>
+              Connect to Web3 applications
+            </li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      title: "Why Choose SUI?",
+      description: "Discover the benefits of the SUI blockchain",
+      image: "path/to/sui-image.svg",
+      content: (
+        <div className="space-y-4">
+          <div className="flex justify-center">
+            <img src={sui} alt="SUI" className="w-32 h-32" />
+          </div>
+          <h3 className="text-xl font-bold text-white">The Power of SUI</h3>
+          <div className="grid grid-cols-1 gap-3">
+            <div className="bg-white/5 rounded-xl p-4">
+              <h4 className="font-medium text-blue-400 mb-2">Fast & Scalable</h4>
+              <p className="text-sm text-white/60">
+                Experience lightning-fast transactions and unlimited scalability
+              </p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4">
+              <h4 className="font-medium text-purple-400 mb-2">Secure</h4>
+              <p className="text-sm text-white/60">
+                Built with advanced cryptography and security measures
+              </p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4">
+              <h4 className="font-medium text-green-400 mb-2">User-Friendly</h4>
+              <p className="text-sm text-white/60">
+                Designed for both beginners and advanced users
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  // Add this function inside the App component
+  const signAndExecuteTransactionBlock = async ({
+    transactionBlock,
+  }: {
+    transactionBlock: TransactionBlock;
+  }) => {
+    if (!ephemeralKeyPair || !zkProof || !decodedJwt || !userSalt) {
+      throw new Error('Missing required zkLogin data');
+    }
+
+    const { bytes, signature: userSignature } = await transactionBlock.sign({
+      client: suiClient,
+      signer: ephemeralKeyPair,
+    });
+
+    const addressSeed = genAddressSeed(
+      BigInt(userSalt),
+      'sub',
+      decodedJwt.sub!,
+      decodedJwt.aud as string
+    ).toString();
+
+    const zkLoginSignature = getZkLoginSignature({
+      inputs: {
+        ...zkProof,
+        addressSeed,
+      },
+      maxEpoch,
+      userSignature,
+    });
+
+    const result = await suiClient.executeTransactionBlock({
+      transactionBlock: bytes,
+      signature: zkLoginSignature,
+    });
+
+    return result;
+  };
+
+  const initializeCounter = async () => {
+    try {
+      // Check if we already have a counter
+      const storedCounterId = window.localStorage.getItem(COUNTER_ID_STORAGE_KEY);
+      if (storedCounterId && isValidSuiObjectId(storedCounterId)) {
+        setCounter(storedCounterId);
+        return;
+      }
+
+      // Only create if we have all required auth data
+      if (!(ephemeralKeyPair && zkProof && decodedJwt && userSalt && zkLoginUserAddress)) {
+        return;
+      }
+
+      const counterPackageId = useNetworkVariable("counterPackageId");
+      const tx = new TransactionBlock();
+      tx.moveCall({
+        arguments: [],
+        target: `${counterPackageId}::counter::create`,
+      });
+      tx.setSender(zkLoginUserAddress);
+
+      const result = await signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+      });
+
+      const { effects } = await suiClient.waitForTransactionBlock({
+        digest: result.digest,
+        options: {
+          showEffects: true,
+        },
+      });
+
+      const newCounterId = effects?.created?.[0]?.reference?.objectId;
+      if (newCounterId) {
+        window.localStorage.setItem(COUNTER_ID_STORAGE_KEY, newCounterId);
+        setCounter(newCounterId);
+        enqueueSnackbar("Counter created successfully!", { variant: "success" });
+      }
+    } catch (error) {
+      console.error("Error initializing counter:", error);
+      enqueueSnackbar("Failed to create counter", { variant: "error" });
+    }
+  };
+
+  useEffect(() => {
+    if (zkLoginUserAddress && !counterId) {
+      initializeCounter();
+    }
+  }, [zkLoginUserAddress]);
 
   if (!zkLoginUserAddress) {
     return (
@@ -1245,9 +1339,75 @@ function App() {
                   </div>
                 </div>
                 {/* Network Info */}
-                <div className="flex flex-col items-end">
-                  <span className="text-xs font-medium text-white/40">Network</span>
-                  <span className="text-sm font-medium text-white/80">Devnet</span>
+                <div className="relative group">
+                  <button 
+                    onClick={(e) => {
+                      const button = e.currentTarget;
+                      const rect = button.getBoundingClientRect();
+                      const dropdown = document.getElementById('network-dropdown');
+                      if (dropdown) {
+                        dropdown.style.top = `${rect.bottom + 8}px`;
+                        dropdown.style.right = `${window.innerWidth - rect.right}px`;
+                        dropdown.classList.toggle('hidden');
+                      }
+                    }}
+                    className="flex flex-col items-end group"
+                  >
+                    <span className="text-xs font-medium text-white/40">Network</span>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        selectedNetwork === 'mainnet' ? 'bg-green-400' :
+                        selectedNetwork === 'testnet' ? 'bg-yellow-400' :
+                        'bg-purple-400'
+                      }`} />
+                      <span className="text-sm font-medium text-white/80 capitalize">{selectedNetwork}</span>
+                      <svg 
+                        className="w-4 h-4 text-white/40 group-hover:text-white/60 transition-colors" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  <div 
+                    id="network-dropdown"
+                    className="hidden absolute z-50 w-48 mt-2 bg-[#1A1B1E] border border-white/10 rounded-xl shadow-lg py-1 focus:outline-none"
+                  >
+                    {['mainnet', 'testnet', 'devnet'].map((network) => (
+                      <button
+                        key={network}
+                        onClick={() => {
+                          setSelectedNetwork(network);
+                          document.getElementById('network-dropdown')?.classList.add('hidden');
+                          // Show notification
+                          enqueueSnackbar(`Switched to ${network}`, {
+                            variant: 'success',
+                          });
+                        }}
+                        className={`w-full px-4 py-2 text-sm text-left flex items-center gap-2 ${
+                          selectedNetwork === network 
+                            ? 'bg-white/5 text-white' 
+                            : 'text-white/60 hover:bg-white/5 hover:text-white'
+                        } transition-colors`}
+                      >
+                        <div className={`w-2 h-2 rounded-full ${
+                          network === 'mainnet' ? 'bg-green-400' :
+                          network === 'testnet' ? 'bg-yellow-400' :
+                          'bg-purple-400'
+                        }`} />
+                        <span className="capitalize">{network}</span>
+                        {selectedNetwork === network && (
+                          <svg className="w-4 h-4 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               {/* Action Buttons */}
@@ -1263,32 +1423,37 @@ function App() {
                 </button>
               </div>
             </div>
+ 
+        
+            {/* Staking Card
+              <StakingCard
+                zkLoginUserAddress={zkLoginUserAddress}
+                addressBalance={addressBalance}
+                handleTransaction={handleSendSui}
+              /> */}
 
-             {/* Earnings Card
-             <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/5">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-gray-200">Earnings Available</span>
-                <button
-                  className="bg-white text-black rounded-full px-6 py-2 text-sm font-medium hover:bg-white/90 transition-colors"
-                >
-                  Withdraw
-                </button>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[48px] font-extrabold text-white tracking-tight">$0</span>
-                <span className="text-[18px] font-medium text-white/60 mt-2">0 SUI</span>
-              </div>
-              
-              <div className="mt-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">Staking timeline</span>
-                  <AiOutlineInfoCircle className="text-gray-400" />
-                </div>
-                <div className="w-full h-1 bg-[#2a2a40] rounded-full mt-2">
-                  <div className="w-1/3 h-full bg-blue-500 rounded-full" />
-                </div>
-              </div>
-            </div> */}
+            {zkLoginUserAddress ? (
+              counterId ? (
+                <Counter 
+                  id={counterId}
+                  signAndExecuteTransactionBlock={signAndExecuteTransactionBlock}
+                  isReady={!!(ephemeralKeyPair && zkProof && decodedJwt && userSalt)}
+                  zkLoginUserAddress={zkLoginUserAddress}
+                />
+              ) : (
+                <CreateCounter
+                  onCreated={(id) => {
+                    window.location.hash = id;
+                    setCounter(id);
+                  }}
+                  signAndExecuteTransactionBlock={signAndExecuteTransactionBlock}
+                  isReady={!!(ephemeralKeyPair && zkProof && decodedJwt && userSalt)}
+                  zkLoginUserAddress={zkLoginUserAddress}
+                />
+              )
+            ) : (
+              <p className="text-white/60 text-center">Please connect your wallet</p>
+            )}  
 
             {/* Stats Navigation with Active Indicator */}
             <div className="mb-6">
@@ -1625,6 +1790,68 @@ function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showWizard && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+          <div className="bg-[#1A1B1E] rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6 space-y-6">
+              {/* Progress bar */}
+              <div className="mb-8">
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-white/60">Progress</span>
+                  <span className="text-sm font-medium text-white">{((wizardStep + 1) / wizardSteps.length * 100).toFixed(0)}%</span>
+                </div>
+                <div className="h-1 bg-white/5 rounded-full">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
+                    style={{ width: `${(wizardStep + 1) / wizardSteps.length * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Step content */}
+              <div className="space-y-6">
+                {wizardSteps[wizardStep].content}
+              </div>
+
+              {/* Navigation buttons */}
+              <div className="flex justify-between mt-8">
+                <button
+                  onClick={() => {
+                    if (wizardStep === 0) {
+                      setShowWizard(false);
+                    } else {
+                      setWizardStep(prev => prev - 1);
+                    }
+                  }}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                >
+                  {wizardStep === 0 ? 'Skip Tutorial' : 'Previous'}
+                </button>
+                
+                {wizardStep < wizardSteps.length - 1 ? (
+                  <button
+                    onClick={() => setWizardStep(prev => prev + 1)}
+                    className="bg-gradient-to-r from-[#0066FF] to-blue-600 hover:from-[#0052cc] hover:to-blue-700 text-white rounded-lg px-6 py-2 text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleWizardComplete}
+                    className="bg-gradient-to-r from-[#0066FF] to-blue-600 hover:from-[#0052cc] hover:to-blue-700 text-white rounded-lg px-6 py-2 text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-2"
+                  >
+                    Get Started
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
