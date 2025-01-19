@@ -1266,7 +1266,7 @@ function App() {
         <img 
             src={sui} 
             alt="SUI" 
-            className="w-8 h-8" 
+            className="w-4 h-4" 
           />
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-1">

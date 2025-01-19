@@ -1,6 +1,6 @@
 import { useSuiClient, useSuiClientQuery } from "@mysten/dapp-kit";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 import { useNetworkVariable } from "../networkConfig";
 
@@ -14,6 +14,11 @@ type CounterProps = {
 export function Counter({ id, signAndExecuteTransactionBlock, isReady = false, zkLoginUserAddress }: CounterProps) {
   const counterPackageId = useNetworkVariable("counterPackageId");
   const suiClient = useSuiClient();
+  const [localValue, setLocalValue] = useState(() => {
+    const stored = localStorage.getItem(`counter_${id}`);
+    return stored ? parseInt(stored) : 0;
+  });
+
   const { data, isPending, error, refetch } = useSuiClientQuery("getObject", {
     id,
     options: {
@@ -21,6 +26,19 @@ export function Counter({ id, signAndExecuteTransactionBlock, isReady = false, z
       showOwner: true,
     },
   });
+
+  useEffect(() => {
+    if (data?.data) {
+      const chainValue = getCounterFields(data.data)?.value || 0;
+      const stored = localStorage.getItem(`counter_${id}`);
+      const storedValue = stored ? parseInt(stored) : 0;
+      
+      if (chainValue > storedValue) {
+        localStorage.setItem(`counter_${id}`, chainValue.toString());
+        setLocalValue(chainValue);
+      }
+    }
+  }, [data, id]);
 
   const [waitingForTxn, setWaitingForTxn] = useState("");
 
@@ -35,6 +53,10 @@ export function Counter({ id, signAndExecuteTransactionBlock, isReady = false, z
         target: `${counterPackageId}::counter::set_value`,
       });
     } else {
+      const newValue = localValue + 1;
+      setLocalValue(newValue);
+      localStorage.setItem(`counter_${id}`, newValue.toString());
+      
       tx.moveCall({
         arguments: [tx.object(id)],
         target: `${counterPackageId}::counter::increment`,
@@ -45,6 +67,13 @@ export function Counter({ id, signAndExecuteTransactionBlock, isReady = false, z
       const result = await signAndExecuteTransactionBlock({ transactionBlock: tx });
       await suiClient.waitForTransaction({ digest: result.digest });
       await refetch();
+    } catch (error) {
+      if (method === "increment") {
+        const revertValue = localValue - 1;
+        setLocalValue(revertValue);
+        localStorage.setItem(`counter_${id}`, revertValue.toString());
+      }
+      console.error('Transaction failed:', error);
     } finally {
       setWaitingForTxn("");
     }
@@ -55,7 +84,7 @@ export function Counter({ id, signAndExecuteTransactionBlock, isReady = false, z
   if (!data.data) return <p className="text-white/60">Not found</p>;
 
   const ownedByCurrentAccount = getCounterFields(data.data)?.owner === zkLoginUserAddress;
-  const currentValue = getCounterFields(data.data)?.value || 0;
+  const currentValue = localValue;
 
   return (
     <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#1A1B1E] to-[#252730] rounded-[32px] border border-white/10 shadow-xl">
@@ -103,17 +132,6 @@ export function Counter({ id, signAndExecuteTransactionBlock, isReady = false, z
         </button>
       )}
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 mt-8 w-full">
-        <div className="bg-white/5 rounded-2xl p-4 text-center">
-          <p className="text-white/60 text-xs mb-1">RANK</p>
-          <p className="text-white text-lg font-bold">#1</p>
-        </div>
-        <div className="bg-white/5 rounded-2xl p-4 text-center">
-          <p className="text-white/60 text-xs mb-1">LEVEL</p>
-          <p className="text-white text-lg font-bold">{Math.floor(Math.log10(currentValue + 1))}</p>
-        </div>
-      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { useSuiClient } from "@mysten/dapp-kit";
 import { useNetworkVariable } from "../networkConfig";
 import ClipLoader from "react-spinners/ClipLoader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type CreateCounterProps = {
   onCreated: (id: string) => void;
@@ -21,6 +21,17 @@ export function CreateCounter({
   const suiClient = useSuiClient();
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    const storedCounterId = localStorage.getItem('counterId');
+    
+    if (isReady && !storedCounterId && !isSuccess && !isPending) {
+      create();
+    } else if (storedCounterId) {
+      setIsSuccess(true);
+      onCreated(storedCounterId);
+    }
+  }, [isReady]);
 
   async function create() {
     setIsPending(true);
@@ -43,8 +54,12 @@ export function CreateCounter({
         },
       });
 
+      const counterId = effects?.created?.[0]?.reference?.objectId!;
+      
+      localStorage.setItem('counterId', counterId);
+      
       setIsSuccess(true);
-      onCreated(effects?.created?.[0]?.reference?.objectId!);
+      onCreated(counterId);
     } catch (e) {
       console.error(e);
     } finally {
@@ -54,25 +69,12 @@ export function CreateCounter({
 
   return (
     <div className="container mx-auto px-4">
-      <button
-        className={`
-          px-6 py-3 rounded-lg text-sm font-semibold
-          ${isSuccess || isPending || !isReady
-            ? 'bg-gray-500 cursor-not-allowed' 
-            : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'}
-          text-white transition-colors duration-200
-        `}
-        onClick={() => create()}
-        disabled={isSuccess || isPending || !isReady}
-      >
-        {isSuccess || isPending ? (
+      {isPending && (
+        <div className="flex items-center justify-center">
           <ClipLoader size={20} color="white" />
-        ) : !isReady ? (
-          "Initializing..."
-        ) : (
-          "Create Counter"
-        )}
-      </button>
+          <span className="ml-2 text-white/60">Creating counter...</span>
+        </div>
+      )}
     </div>
   );
 }
