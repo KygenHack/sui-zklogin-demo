@@ -24,6 +24,15 @@ export const STEPS_LABELS_TRANS_KEY = ['16e758e8', '9b8b5398', '8adf5b45', '8b72
 
 export const STEPS_DESC = ['ephemeralKeyPair', '47b83f4e', 'fb399be8', '0a710e64', '32255d31', '8f2433d9']
 
+
 export const DEVNET_COUNTER_PACKAGE_ID = "0x6de3a99e2911619a7e2441b7c24d9fc21f5dd6b3aab28a4178910c6bb8696b02";
 export const TESTNET_COUNTER_PACKAGE_ID = "0xTODO";
 export const MAINNET_COUNTER_PACKAGE_ID = "0xTODO";
+
+export const ADDRESSES = {
+    LIQUID_STAKING: "0x4888170aebf8fecb58eb78a816900c4588ec94d07f6a8927a1775ebd187b4503", // Package ID of the liquid staking contract
+    ADMIN_CAP: "0x304c92cb3a91e104d1195c106d862cf7d37d6fc5d1353d12540329b01bb00ab4", // Admin Cap ID
+    COLLECTION_CAP: "0xa6025be70ea3db579bea90763b17cab7396035b859b2a540e0badd5ff65c4959", // Collection Fee Cap ID
+    SUI_COIN: "0x2::sui::SUI", // SUI Coin Type
+    // Add any other relevant addresses or constants here
+};

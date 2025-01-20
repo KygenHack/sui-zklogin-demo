@@ -21,6 +21,8 @@
     "@mysten/sui.js": "^0.46.1",
     "@mysten/zklogin": "^0.3.4",
     "@noble/curves": "^1.2.0",
+    "@polymedia/suitcase-core": "^0.0.32",
+    "@polymedia/suitcase-react": "^0.0.32",
     "@tanstack/react-query": "^5.8.4",
     "@telegram-apps/sdk-react": "^2.0.25",
     "@telegram-apps/telegram-ui": "^2.1.8",

@@ -53,9 +53,10 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { sui, suistakeLogo } from "./images";
 import { NetworkTab } from './components/NetworkTab';
-import { CreateCounter } from "./components/CreateCounter";
-import { Counter } from "./components/Counter";
+// import { CreateCounter } from "./components/CreateCounter";
+// import { Counter } from "./components/Counter";
 import { useNetworkVariable } from "./networkConfig";
+import { StakingCard } from "./components/StakingCard";
 
 interface ExtendedJwtPayload extends JwtPayload {
   email?: string;
@@ -1425,14 +1426,13 @@ function App() {
             </div>
  
         
-            {/* Staking Card
               <StakingCard
                 zkLoginUserAddress={zkLoginUserAddress}
                 addressBalance={addressBalance}
                 handleTransaction={handleSendSui}
-              /> */}
+              />
 
-            {zkLoginUserAddress ? (
+            {/* {zkLoginUserAddress ? (
               counterId ? (
                 <Counter 
                   id={counterId}
@@ -1453,7 +1453,7 @@ function App() {
               )
             ) : (
               <p className="text-white/60 text-center">Please connect your wallet</p>
-            )}  
+            )}   */}
 
             {/* Stats Navigation with Active Indicator */}
             <div className="mb-6">
