@@ -36,6 +36,8 @@ import { RiMessage3Line } from 'react-icons/ri';
 import { QRCodeSVG } from 'qrcode.react';
 import { FiLogOut } from 'react-icons/fi';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { createPlayerProfile, SuisitMiner, loginAndSavePlayer } from './hooks/playerSuperbase';
+import SplashScreen from './components/SplashScreen';
 
 import {
   CLIENT_ID,
@@ -53,10 +55,8 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { sui, suistakeLogo } from "./images";
 import { NetworkTab } from './components/NetworkTab';
-// import { CreateCounter } from "./components/CreateCounter";
-// import { Counter } from "./components/Counter";
 import { useNetworkVariable } from "./networkConfig";
-import { StakingCard } from "./components/StakingCard";
+import { IdleStakingGame  } from './components/IdleEarningGame';
 
 interface ExtendedJwtPayload extends JwtPayload {
   email?: string;
@@ -161,7 +161,7 @@ const CommunityTab = () => (
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-white/60">Total Reward:</span>
-          <span className="text-xs font-medium text-green-400">2.5 points</span>
+          <span className="text-xs font-medium text-green-400">0 SUISIT</span>
         </div>
       </div>
       
@@ -177,7 +177,7 @@ const CommunityTab = () => (
             </div>
             <div>
               <p className="text-sm font-medium text-white">Follow on X</p>
-              <p className="text-xs text-white/60">Reward: 1.0 points</p>
+              <p className="text-xs text-white/60">Reward: 1.0 SUISIT</p>
             </div>
           </div>
           <p className="text-sm text-white/80 mb-3">Follow @SuiStakeit on X and retweet our pinned post</p>
@@ -194,8 +194,34 @@ const CommunityTab = () => (
           </a>
         </div>
 
-        Facebook Task
-        <div className="bg-white/5 rounded-xl p-4">
+         {/* YouTube Task */}
+         <div className="bg-white/5 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-8 h-8 rounded-full bg-[#FF0000] flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-white">Subscribe on YouTube</p>
+              <p className="text-xs text-white/60">Reward: 0.75 SUISIT</p>
+            </div>
+          </div>
+          <p className="text-sm text-white/80 mb-3">Subscribe to our YouTube channel and like our latest video</p>
+          <a 
+            href="https://www.youtube.com/channel/YourChannelID" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            Complete Task
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </div>
+
+          <div className="bg-white/5 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 rounded-full bg-[#1877F2] flex items-center justify-center">
               <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -204,7 +230,7 @@ const CommunityTab = () => (
             </div>
             <div>
               <p className="text-sm font-medium text-white">Follow on Facebook</p>
-              <p className="text-xs text-white/60">Reward: 0.75 points</p>
+              <p className="text-xs text-white/60">Reward: 0.75 SUISIT</p>
             </div>
           </div>
           <p className="text-sm text-white/80 mb-3">Like our Facebook page and share our latest post</p>
@@ -231,7 +257,7 @@ const CommunityTab = () => (
             </div>
             <div>
               <p className="text-sm font-medium text-white">Join Telegram Community</p>
-              <p className="text-xs text-white/60">Reward: 0.75 points</p>
+              <p className="text-xs text-white/60">Reward: 0.75 SUISIT</p>
             </div>
           </div>
           <p className="text-sm text-white/80 mb-3">Join our Telegram group and stay active</p>
@@ -280,44 +306,10 @@ const ActivityTab = () => (
         <p className="text-white/60 mb-2">No transactions yet</p>
         <p className="text-sm text-white/40">Your transaction history will appear here</p>
       </div>
-
-      {/* Transaction List (hidden initially) */}
-      <div className="hidden space-y-3">
-        {/* Sample Transaction */}
-        <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-            <img 
-            src={sui} 
-            alt="SUI" 
-            className="w-8 h-8" 
-          />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-white">Sent SUI</p>
-              <p className="text-xs text-white/60">To: 0x1234...5678</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-medium text-white">-1.0 SUI</p>
-            <p className="text-xs text-white/60">2 mins ago</p>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 );
 
-// Add this interface for the API response
-interface BlockberryResponse {
-  data: {
-    content: Array<{
-      price: number;
-      priceChange24h: number;
-      // Add other fields as needed
-    }>;
-  };
-}
 
 function App() {
   const { i18n } = useTranslation();
@@ -358,14 +350,69 @@ function App() {
   const [priceChange24h, setPriceChange24h] = useState<number>(0);
   const initDataState = useSignal(initData.state);
   const user = initDataState?.user;
+  const [player, setPlayer] = useState<SuisitMiner | null>(null);
+  const [showSplashScreen, setShowSplashScreen] = useState(true);
 
+  useEffect(() => {
+    if (player) {
+      enqueueSnackbar(`Welcome back, ${player.userName || player.firstName || 'Player'}!`, {
+        variant: 'success',
+        autoHideDuration: 3000,
+      });
+    }
+  }, [player]);
+          
+  const handleLogin = async () => {
+    if (decodedJwt && zkLoginUserAddress && userSalt) {
+      const zkLoginData: Partial<SuisitMiner> = {
+        walletAddress: zkLoginUserAddress,
+        jwtToken: jwtString,
+        userSalt: userSalt,
+        maxEpoch: maxEpoch,
+        email: decodedJwt.email,
+      };
+  
+      const telegramData: Partial<SuisitMiner> = {
+        userName: user?.username,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        photoUrl: user?.photoUrl,
+        isBot: user?.isBot,
+        isPremium: user?.isPremium,
+        languageCode: user?.languageCode,
+      };
+  
+      try {
+        const savedPlayer = await loginAndSavePlayer(zkLoginData, telegramData);
+        if (savedPlayer) {
+          setPlayer(savedPlayer);
+          enqueueSnackbar("Player data saved successfully", { variant: "success" });
+        } else {
+          enqueueSnackbar("Failed to save player data", { variant: "error" });
+        }
+      } catch (error) {
+        console.error("Error saving player data:", error);
+        enqueueSnackbar("Error saving player data", { variant: "error" });
+      }
+    }
+  };
+
+  useEffect(() => {
+    handleLogin();
+  }, [decodedJwt, zkLoginUserAddress, userSalt]);
+
+  useEffect(() => {
+    if (zkProof) {
+      enqueueSnackbar("ZK Proof generated successfully", { variant: "success" });
+    }
+  }, [zkProof]);
 
     const [counterId, setCounter] = useState(() => {
       const hash = window.location.hash.slice(1);
       return isValidSuiObjectId(hash) ? hash : null;
     });
 
-
+  
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -787,79 +834,31 @@ function App() {
 
   useEffect(() => {
     const fetchSuiPrice = async () => {
-      const options = {
-        method: 'GET',
-        url: 'https://cors.blockberry.one/sui/v1/coins', // Using CORS-enabled endpoint
-        params: {
-          page: '0',
-          size: '20',
-          orderBy: 'DESC',
-          sortBy: 'AGE',
-          withImage: 'TRUE'
-        },
-        headers: {
-          accept: '*/*',
-          'x-api-key': 'V4O9xRP59Iv1Shv6SXI3lD55HHYdHN'
-        },
-        // Add timeout and retry configuration
-        timeout: 5000,
-        retries: 3
-      };
-
       try {
-        const response = await axios.request<BlockberryResponse>(options);
-        
-        if (response.data && response.data.data && response.data.data.content && response.data.data.content.length > 0) {
-          const suiData = response.data.data.content[0];
-          setSuiPrice(suiData.price);
-          setPriceChange24h(suiData.priceChange24h);
-        } else {
-          // Fallback to a different API if Blockberry fails
-          const fallbackResponse = await axios.get(
-            'https://api.coingecko.com/api/v3/simple/price?ids=sui&vs_currencies=usd&include_24hr_change=true'
-          );
-          setSuiPrice(fallbackResponse.data.sui.usd);
-          setPriceChange24h(fallbackResponse.data.sui.usd_24h_change);
-        }
+        const response = await axios.get(
+          'https://api.coingecko.com/api/v3/simple/price?ids=sui&vs_currencies=usd&include_24hr_change=true'
+        );
+        setSuiPrice(response.data.sui.usd);
+        setPriceChange24h(response.data.sui.usd_24h_change);
       } catch (error) {
         console.error('Error fetching SUI price:', error);
-        
-        // Attempt fallback to CoinGecko if Blockberry fails
-        try {
-          const fallbackResponse = await axios.get(
-            'https://api.coingecko.com/api/v3/simple/price?ids=sui&vs_currencies=usd&include_24hr_change=true'
-          );
-          setSuiPrice(fallbackResponse.data.sui.usd);
-          setPriceChange24h(fallbackResponse.data.sui.usd_24h_change);
-        } catch (fallbackError) {
-          console.error('Fallback API also failed:', fallbackError);
-          enqueueSnackbar('Unable to fetch price data', { 
-            variant: 'error',
-            action: () => (
-              <Button color="inherit" size="small" onClick={() => window.location.reload()}>
-                Retry
-              </Button>
-            )
-          });
-        }
+        enqueueSnackbar('Unable to fetch price data', { 
+          variant: 'error',
+          action: () => (
+            <Button color="inherit" size="small" onClick={() => window.location.reload()}>
+              Retry
+            </Button>
+          )
+        });
       }
     };
 
     fetchSuiPrice();
     
-    // Add error handling for the interval
-    let intervalId: NodeJS.Timeout;
-    try {
-      intervalId = setInterval(fetchSuiPrice, 60000);
-    } catch (error) {
-      console.error('Error setting up price refresh interval:', error);
-    }
+    const intervalId = setInterval(fetchSuiPrice, 60000);
 
-    // Cleanup
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
+      clearInterval(intervalId);
     };
   }, []);
 
@@ -1145,6 +1144,41 @@ function App() {
     }
   }, [zkLoginUserAddress]);
 
+  useEffect(() => {
+    const initializePlayerProfile = async () => {
+      if (zkLoginUserAddress && decodedJwt && user) {
+        const zkLoginData: Partial<SuisitMiner> = {
+          walletAddress: zkLoginUserAddress,
+          jwtToken: jwtString,
+          userSalt: userSalt || '',
+          maxEpoch: maxEpoch,
+          email: decodedJwt.email,
+        };
+
+        const telegramData: Partial<SuisitMiner> = {
+          userName: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          photoUrl: user.photoUrl,
+          isBot: user.isBot,
+          isPremium: user.isPremium,
+          languageCode: user.languageCode,
+        };
+
+        const profile = await createPlayerProfile(zkLoginData, telegramData);
+        if (profile) {
+          console.log('Player profile created/updated:', profile);
+        }
+      }
+    };
+
+    initializePlayerProfile();
+  }, [zkLoginUserAddress, decodedJwt, user]);
+
+  if (showSplashScreen) {
+    return <SplashScreen onComplete={() => setShowSplashScreen(false)} />;
+  }
+
   if (!zkLoginUserAddress) {
     return (
       <div className="flex flex-col min-h-screen bg-[#0A0A0F] text-white antialiased">
@@ -1424,36 +1458,8 @@ function App() {
                 </button>
               </div>
             </div>
- 
-        
-              <StakingCard
-                zkLoginUserAddress={zkLoginUserAddress}
-                addressBalance={addressBalance}
-                handleTransaction={handleSendSui}
-              />
 
-            {/* {zkLoginUserAddress ? (
-              counterId ? (
-                <Counter 
-                  id={counterId}
-                  signAndExecuteTransactionBlock={signAndExecuteTransactionBlock}
-                  isReady={!!(ephemeralKeyPair && zkProof && decodedJwt && userSalt)}
-                  zkLoginUserAddress={zkLoginUserAddress}
-                />
-              ) : (
-                <CreateCounter
-                  onCreated={(id) => {
-                    window.location.hash = id;
-                    setCounter(id);
-                  }}
-                  signAndExecuteTransactionBlock={signAndExecuteTransactionBlock}
-                  isReady={!!(ephemeralKeyPair && zkProof && decodedJwt && userSalt)}
-                  zkLoginUserAddress={zkLoginUserAddress}
-                />
-              )
-            ) : (
-              <p className="text-white/60 text-center">Please connect your wallet</p>
-            )}   */}
+            <IdleStakingGame walletAddress={zkLoginUserAddress} />
 
             {/* Stats Navigation with Active Indicator */}
             <div className="mb-6">
@@ -1764,7 +1770,7 @@ function App() {
               }`}>
                 {snackbar.type === 'success' && <CheckCircleIcon className="w-5 h-5" />}
                 {snackbar.type === 'error' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-                {snackbar.type === 'warning' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
+                {snackbar.type === 'warning' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
                 {snackbar.type === 'info' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
               </div>
               
