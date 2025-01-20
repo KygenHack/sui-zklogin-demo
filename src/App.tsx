@@ -164,7 +164,7 @@ const CommunityTab = () => (
           <span className="text-xs font-medium text-green-400">0 SUISIT</span>
         </div>
       </div>
-
+      
       {/* Social Media Tasks List */}
       <div className="space-y-4">
         {/* X (Twitter) Task */}
@@ -265,7 +265,7 @@ const CommunityTab = () => (
             href="https://t.me/suistakeit" 
             target="_blank" 
             rel="noopener noreferrer" 
-
+            
             className="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
             Complete Task
@@ -297,7 +297,7 @@ const ActivityTab = () => (
           Filter
         </Button>
       </div>
-
+      
       {/* Empty State */}
       <div className="text-center py-12">
         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
@@ -361,7 +361,7 @@ function App() {
       });
     }
   }, [player]);
-
+          
   const handleLogin = async () => {
     if (decodedJwt && zkLoginUserAddress && userSalt) {
       const zkLoginData: Partial<SuisitMiner> = {
@@ -371,7 +371,7 @@ function App() {
         maxEpoch: maxEpoch,
         email: decodedJwt.email,
       };
-
+  
       const telegramData: Partial<SuisitMiner> = {
         userName: user?.username,
         firstName: user?.firstName,
@@ -381,7 +381,7 @@ function App() {
         isPremium: user?.isPremium,
         languageCode: user?.languageCode,
       };
-
+  
       try {
         const savedPlayer = await loginAndSavePlayer(zkLoginData, telegramData);
         if (savedPlayer) {
@@ -412,7 +412,7 @@ function App() {
       return isValidSuiObjectId(hash) ? hash : null;
     });
 
-
+  
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -438,28 +438,17 @@ function App() {
 
   // Enhance initial setup effect
   useEffect(() => {
-useEffect(() => {
-  if (user?.id) {
-    const storedUserId = localStorage.getItem('last_user_id');
-    if (storedUserId !== user.id.toString()) {
-      // Clear all zkLogin related data
-      localStorage.clear();
-      // Store the new user ID
-      localStorage.setItem('last_user_id', user.id.toString());
-    }
-  }
-}, [user?.id]);
     const initializeWallet = async () => {
       try {
         setIsInitializing(true);
-
+        
         // Restore JWT and decoded data
         const storedJwt = window.localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
         if (storedJwt) {
           setJwtString(storedJwt);
           const decoded = jwtDecode(storedJwt) as ExtendedJwtPayload;
           setDecodedJwt(decoded);
-
+          
           // Generate salt from email if available
           if (decoded.email && !userSalt) {
             const newSalt = generateDeterministicSalt(decoded.email);
@@ -765,7 +754,7 @@ useEffect(() => {
         try {
           const decodedToken = jwtDecode(jwtString);
           const expirationTime = (decodedToken.exp || 0) * 1000; // Convert to milliseconds
-
+          
           if (Date.now() >= expirationTime) {
             enqueueSnackbar('Session expired. Please sign in again.', { 
               variant: 'warning',
@@ -792,11 +781,11 @@ useEffect(() => {
     const refreshSession = async () => {
       try {
         if (!jwtString || !maxEpoch) return;
-
+        
         // Get current epoch
         const { epoch } = await suiClient.getLatestSuiSystemState();
         const currentEpoch = Number(epoch);
-
+        
         // If we're approaching max epoch (e.g., within 5 epochs), refresh
         if (maxEpoch - currentEpoch <= 5) {
           // Re-fetch JWT token
@@ -865,7 +854,7 @@ useEffect(() => {
     };
 
     fetchSuiPrice();
-
+    
     const intervalId = setInterval(fetchSuiPrice, 60000);
 
     return () => {
@@ -1227,7 +1216,7 @@ useEffect(() => {
               </span>
             </div>
           </div>
-
+          
           {/* Add this button */}
            <Button 
             className="relative overflow-hidden bg-gradient-to-r from-[#0066FF] to-blue-700 hover:from-[#0052cc] hover:to-blue-800 text-white rounded-[20px] px-8 py-5 font-medium transition-all duration-300 flex items-center gap-2 shadow-lg shadow-blue-500/20 border border-white/10 hover:scale-105"
@@ -1784,7 +1773,7 @@ useEffect(() => {
                 {snackbar.type === 'warning' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
                 {snackbar.type === 'info' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
               </div>
-
+              
               {/* Content */}
               <div className="flex-1">
                 <p className="text-white font-medium">{snackbar.message}</p>
@@ -1792,7 +1781,7 @@ useEffect(() => {
                   <p className="text-white/60 text-sm mt-1">{snackbar.description}</p>
                 )}
               </div>
-
+              
               {/* Close button */}
               <button
                 onClick={() => {
@@ -1849,7 +1838,7 @@ useEffect(() => {
                 >
                   {wizardStep === 0 ? 'Skip Tutorial' : 'Previous'}
                 </button>
-
+                
                 {wizardStep < wizardSteps.length - 1 ? (
                   <button
                     onClick={() => setWizardStep(prev => prev + 1)}
