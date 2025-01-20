@@ -5,7 +5,6 @@ export const useMining = (walletAddress: string) => {
   const [player, setPlayer] = useState<SuisitMiner | null>(null);
   const [mining, setMining] = useState(false);
 
-  const ENERGY_REGEN_RATE = 1; // energy per minute
   const MAX_ENERGY = 100;
   const BASE_MINING_RATE = 0.1; // tokens per second
   
