@@ -23,10 +23,6 @@ export const IdleStakingGame: React.FC<IdleStakingGameProps> = ({ walletAddress 
 
   return (
     <div className="bg-gradient-to-br from-[#1A1B1E] to-[#252730] rounded-[24px] p-6 border border-white/5">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-white">Idle Staking Game</h2>
-      </div>
-
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-black/20 rounded-xl p-4">
           <span className="text-sm text-white/60">Days Staked</span>
@@ -64,21 +60,13 @@ export const IdleStakingGame: React.FC<IdleStakingGameProps> = ({ walletAddress 
         </button>
 
         <div className="bg-black/20 rounded-xl p-4">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-white/60">Total Staked</span>
-            <span className="text-sm font-medium text-white">{player.rewards.toFixed(2)} SUI</span>
-          </div>
-        </div>
-
-        <div className="text-sm text-white/60">
-          <p>HOW TO PARTICIPATE</p>
-          <ul className="list-disc pl-5 mt-2">
-            <li>Deposit: Minimum 1 SUI</li>
-            <li>Earn: 1% daily for 5 days, increasing by 0.5% every 5 days</li>
-            <li>Max Earning: 4% daily for 100 days</li>
-            <li>Renewal: New deposit ≥ previous balance</li>
-          </ul>
-        </div>
+  <div className="flex justify-between items-center">
+    <span className="text-sm text-white/60">Total Staked</span>
+    <span className="text-sm font-medium text-white">
+      {player.rewards ? player.rewards.toFixed(2) : '0.00'} SUI
+    </span>
+  </div>
+</div>
       </div>
     </div>
   );
