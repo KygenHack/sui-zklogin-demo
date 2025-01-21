@@ -56,7 +56,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { sui, suistakeLogo } from "./images";
 import { NetworkTab } from './components/NetworkTab';
 import { useNetworkVariable } from "./networkConfig";
-import { IdleStakingGame  } from './components/IdleEarningGame';
 import { StakeToEarnSimulator } from "./components/StakeToEarnSimulator";
 
 interface ExtendedJwtPayload extends JwtPayload {
@@ -1462,7 +1461,6 @@ function App() {
 
             {/* <IdleStakingGame walletAddress={zkLoginUserAddress} /> */}
             <StakeToEarnSimulator walletAddress={zkLoginUserAddress} />
-
 
             {/* Stats Navigation with Active Indicator */}
             <div className="mb-6">
