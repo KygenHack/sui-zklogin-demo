@@ -1,105 +1,59 @@
 import { useState } from 'react';
-import { Button } from '@mui/material';
-import { FaCoins, FaExternalLinkAlt } from 'react-icons/fa';
-// Mock data
-const MOCK_USER = {
-  rank: 2,
-  referrer: {
-    username: 'cryptowhale',
-    firstName: 'Crypto',
-    lastName: 'Whale',
-    photoUrl: 'https://xelene.me/telegram.gif',
-    isPremium: true
-  },
-  id: '12345'
-};
-
-const getRankTier = (rank: number) => {
-  const tiers = ['Starter', 'Visionary', 'Pioneer', 'Accumulator', 'Elite', 'Legendary', 'Supreme'];
-  return tiers[rank] || 'Unranked';
-};
-
+import { IconButton, Tooltip } from '@mui/material';
+import { FaTwitter, FaTelegram, FaCopy } from 'react-icons/fa';
 
 export const NetworkTab = () => {
   const [selectedLevel, setSelectedLevel] = useState(1);
-  const user = MOCK_USER; // Using mock data
+  const [] = useState<{ referred_id: number; referred_username: string }[]>([]);
+  const [levelMembers, ] = useState<number[]>([]);
+  const [referralLink, ] = useState('');
 
   return (
     <div className="flex-1 sm:p-6 space-y-6">
       {/* Referral Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bonus Stats */}
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
-          <div className="grid grid-cols-2 gap-4">
-            {/* Total Paid Out */}
-            <div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                  <FaCoins className="text-green-500 text-xl" />
-                </div>
-                <span className="text-gray-400">Total paid out</span>
-              </div>
-              <span className="text-2xl font-bold text-white tabular-nums">$0</span>
-              <span className="text-sm text-gray-400 block mt-1">0 SUI</span>
-            </div>
-
-            {/* Expected Rank Bonus */}
-            <div className="bg-black/20 rounded-2xl p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                  <FaCoins className="text-yellow-500 text-xl" />
-                </div>
-                <span className="text-gray-400">Expected bonus</span>
-              </div>
-              <span className="text-2xl font-bold text-white tabular-nums">$0</span>
-              <span className="text-sm text-gray-400 block mt-1">0 SUI</span>
+        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-6 shadow-xl">
+          <h3 className="text-xl font-semibold text-white mb-4">Your Referral Link</h3>
+          <div className="bg-black/30 rounded-xl p-4 mb-4">
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={referralLink}
+                readOnly
+                className="bg-transparent text-gray-300 text-sm flex-1 outline-none"
+              />
+              <Tooltip title="Copy Link">
+                <IconButton
+                  onClick={() => navigator.clipboard.writeText(referralLink)}
+                  className="text-white hover:text-[#0066FF] transition-colors"
+                >
+                  <FaCopy size={20} />
+                </IconButton>
+              </Tooltip>
             </div>
           </div>
-        </div>
-
-        {/* Referral Link */}
-        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-lg font-semibold text-gray-200">Your Referral Link</span>
-            <Button
-              size="small"
-              className="bg-[#0066FF] text-white rounded-full px-4 py-2"
-            >
-              Copy
-            </Button>
-          </div>
-          <div className="bg-black/20 rounded-xl p-3 flex items-center gap-2 backdrop-blur-sm">
-            <span className="text-gray-400 text-sm truncate flex-1">
-              https://t.me/SUI_Stake_It_Bot?start={user?.id}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-400">
+              Share this link to earn rewards from referrals
             </span>
-            <Button
-              size="small"
-              className="bg-white/10 text-white rounded-full p-2"
-            >
-              <FaExternalLinkAlt className="text-xs" />
-            </Button>
-          </div>
-          <span className="text-sm text-gray-400 block mt-3">
-            Share this link to earn rewards from referrals
-          </span>
-        </div>
-      </div>
-
-      {/* Rank Progress */}
-      <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-lg font-semibold text-gray-200">Rank Progress</span>
-          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-500/20 text-blue-400 rounded-full">
-            Current: {getRankTier(user?.rank || 0)}
-          </span>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-blue-500 rounded-full" 
-              style={{ width: '30%' }}
-            />
+            <div className="flex gap-2">
+              <Tooltip title="Share on Twitter">
+                <IconButton
+                  onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Join me on SuiStakeIt! ${referralLink}`)}`, '_blank')}
+                  className="bg-white/10 hover:bg-white/20 text-white hover:text-[#1DA1F2] rounded-full p-2 transition-colors"
+                >
+                  <FaTwitter size={20} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Share on Telegram">
+                <IconButton
+                  onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent('Join me on SuiStakeIt!')}`, '_blank')}
+                  className="bg-white/10 hover:bg-white/20 text-white hover:text-[#0088cc] rounded-full p-2 transition-colors"
+                >
+                  <FaTelegram size={20} />
+                </IconButton>
+              </Tooltip>
+            </div>
           </div>
         </div>
       </div>
@@ -125,18 +79,26 @@ export const NetworkTab = () => {
           </div>
         </div>
 
-        {/* Empty State */}
+        {/* Display Level Members */}
         <div className="text-center py-8 bg-black/20 rounded-xl">
-          <span className="text-gray-400">
-            No Level {selectedLevel} referrals
-          </span>
+          {levelMembers.length > 0 ? (
+            <ul className="text-gray-400">
+              {levelMembers.map((memberId) => (
+                <li key={memberId}>Member ID: {memberId}</li>
+              ))}
+            </ul>
+          ) : (
+            <span className="text-gray-400">
+              No Level {selectedLevel} referrals
+            </span>
+          )}
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-4 mt-6">
           <div className="bg-black/20 rounded-xl p-4">
             <span className="text-gray-400 text-sm">Level {selectedLevel} Referrals</span>
-            <span className="text-xl font-bold text-white block mt-1">0</span>
+            <span className="text-xl font-bold text-white block mt-1">{levelMembers.length}</span>
           </div>
           <div className="bg-black/20 rounded-xl p-4">
             <span className="text-gray-400 text-sm">Total Rewards</span>
@@ -148,4 +110,4 @@ export const NetworkTab = () => {
   );
 };
 
-export default NetworkTab; 
+export default NetworkTab;

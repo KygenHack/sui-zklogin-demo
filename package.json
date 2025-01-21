@@ -21,7 +21,6 @@
     "@mysten/sui.js": "^0.46.1",
     "@mysten/zklogin": "^0.3.4",
     "@noble/curves": "^1.2.0",
-    "@supabase/supabase-js": "^2.48.0",
     "@tanstack/react-query": "^5.8.4",
     "@telegram-apps/sdk-react": "^2.0.25",
     "@telegram-apps/telegram-ui": "^2.1.8",
@@ -32,7 +31,6 @@
     "buffer": "^6.0.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
-    "framer-motion": "^12.0.0",
     "i18next": "^23.7.6",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.473.0",
@@ -46,7 +44,9 @@
     "react-icons": "^5.4.0",
     "react-router-dom": "^6.18.0",
     "react-spinners": "^0.15.0",
-    "react-syntax-highlighter": "^15.5.0"
+    "react-syntax-highlighter": "^15.5.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "framer-motion": "^10.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
