@@ -1,12 +1,30 @@
-import { useState } from 'react';
-import { IconButton, Tooltip } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { IconButton, Tooltip, Button } from '@mui/material';
 import { FaTwitter, FaTelegram, FaCopy } from 'react-icons/fa';
+import axios from 'axios';
 
 export const NetworkTab = () => {
   const [selectedLevel, setSelectedLevel] = useState(1);
-  const [] = useState<{ referred_id: number; referred_username: string }[]>([]);
-  const [levelMembers, ] = useState<number[]>([]);
-  const [referralLink, ] = useState('');
+  const [referralLink, setReferralLink] = useState('');
+  const [levelMembers, setLevelMembers] = useState<number[]>([]);
+  const [totalRewards, setTotalRewards] = useState<number>(0);
+
+  useEffect(() => {
+    // Fetch referral link and stats from the backend
+    const fetchReferralData = async () => {
+      try {
+        const response = await axios.get('/api/referrals'); // Adjust the endpoint as needed
+        setReferralLink(response.data.referralLink);
+        setLevelMembers(response.data.levelMembers);
+        setTotalRewards(response.data.totalRewards);
+      } catch (error) {
+        console.error('Error fetching referral data:', error);
+      } finally {
+      }
+    };
+
+    fetchReferralData();
+  }, []);
 
   return (
     <div className="flex-1 sm:p-6 space-y-6">
@@ -61,20 +79,16 @@ export const NetworkTab = () => {
       {/* Referral Levels */}
       <div className="bg-gradient-to-br from-[#1a1a2e] to-[#2d1f31] rounded-2xl p-5 sm:p-6 shadow-xl">
         <div className="flex items-center justify-between mb-6">
-          <span className="text-lg font-semibold text-gray-200">Referral Levels</span>
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((level) => (
-              <button
+              <Button
                 key={level}
                 onClick={() => setSelectedLevel(level)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  level === selectedLevel
-                    ? 'bg-[#0066FF] text-white'
-                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
-                }`}
+                variant={level === selectedLevel ? 'contained' : 'outlined'}
+                color="primary"
               >
                 {level}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -102,7 +116,7 @@ export const NetworkTab = () => {
           </div>
           <div className="bg-black/20 rounded-xl p-4">
             <span className="text-gray-400 text-sm">Total Rewards</span>
-            <span className="text-xl font-bold text-white block mt-1">0 SUI</span>
+            <span className="text-xl font-bold text-white block mt-1">{totalRewards} SUI</span>
           </div>
         </div>
       </div>
