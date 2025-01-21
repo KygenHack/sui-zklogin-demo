@@ -57,6 +57,7 @@ import { sui, suistakeLogo } from "./images";
 import { NetworkTab } from './components/NetworkTab';
 import { useNetworkVariable } from "./networkConfig";
 import { IdleStakingGame  } from './components/IdleEarningGame';
+import { StakeToEarnSimulator } from "./components/StakeToEarnSimulator";
 
 interface ExtendedJwtPayload extends JwtPayload {
   email?: string;
@@ -1459,7 +1460,9 @@ function App() {
               </div>
             </div>
 
-            <IdleStakingGame walletAddress={zkLoginUserAddress} />
+            {/* <IdleStakingGame walletAddress={zkLoginUserAddress} /> */}
+            <StakeToEarnSimulator walletAddress={zkLoginUserAddress} />
+
 
             {/* Stats Navigation with Active Indicator */}
             <div className="mb-6">
